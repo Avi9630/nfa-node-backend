@@ -1,0 +1,22 @@
+{
+  "name": "nfa-backend",
+  "version": "1.0.0",
+  "description": "This is backend of National Film Award ()\u001b[DNFA\u001b[C\u001b[D)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^3.0.2",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "joi": "^17.13.3",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.14.0",
+    "nodemailer": "^6.10.0",
+    "sequelize": "^6.37.6",
+    "validator": "^13.12.0"
+  }
+}
