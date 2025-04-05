@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../models");
+const bcrypt = require("bcryptjs");
 
 const Client = sequelize.define(
   "Client",
@@ -11,6 +12,10 @@ const Client = sequelize.define(
     },
 
     usertype: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    website_type: {
       type: DataTypes.INTEGER,
       allowNull: false,
     },
@@ -115,7 +120,7 @@ const Client = sequelize.define(
     tableName: "clients",
     hooks: {
       beforeCreate: (client) => {
-        client.password = bcrypt.hashSync(client.password, 10);
+        client.password = bcrypt.hashSync(client.password, 8);
       },
     },
   }
