@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const clientController = require("../controllers/clientController");
+
+router.get("/get-user-type", clientController.getUserType);
+router.post("/register", clientController.register);
+
 // const readController = require("../controllers/readController");
 // const nfaFeatureController = require("../controllers/nfaFeatureController");
 // const nfaNonFeatureController = require("../controllers/nfaNonFeatureController");
@@ -16,8 +20,8 @@ const clientController = require("../controllers/clientController");
 // const paymentController = require("../controllers/paymentController");
 
 // router.get("/send-activate-link", clientController.sendActivateLink);
-// router.post("/get-user-type", clientController.getUserType);
-router.post("/register", clientController.register);
+
+//
 // router.post("/login", clientController.login);
 
 // Account Activation & Password

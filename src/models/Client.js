@@ -121,4 +121,32 @@ const Client = sequelize.define(
   }
 );
 
-module.exports = Client;
+const generateUsername = async (usertype) => {
+  const latestUser = await Client.findOne({
+    where: { usertype },
+    order: [["id", "DESC"]],
+    attributes: ["username"],
+  });
+
+  // 2. Default base prefix based on usertype
+  let prefix = "";
+  if (usertype === "1") {
+    prefix = "PRO000";
+  } else if (usertype === "2") {
+    prefix = "PUB000";
+  } else {
+    prefix = "OTR000";
+  }
+
+  // 3. Generate new username
+  if (!latestUser || !latestUser.username) {
+    return `${prefix}1`;
+  } else {
+    // Extract number from existing username
+    const numPart = parseInt(latestUser.username.replace(prefix, "")) || 0;
+    const newNumber = numPart + 1;
+    return `${prefix}${newNumber}`;
+  }
+};
+
+module.exports = { Client, generateUsername };
