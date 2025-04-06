@@ -14,10 +14,21 @@ const register = async (req, res) => {
   }
 
   try {
-    const user = await Client.findOne({ where: { email: req.body.email } });
-    if (user) {
+    const userEmail = await Client.findOne({
+      where: { email: req.body.email },
+    });
+    if (userEmail) {
       return res.status(404).json({
         error: "Email already been taken, Please provide valid email.!!",
+      });
+    }
+
+    const userMobile = await Client.findOne({
+      where: { mobile: req.body.mobile },
+    });
+    if (userMobile) {
+      return res.status(404).json({
+        error: "Mobile already been taken, Please provide valid Mobile.!!",
       });
     }
 
