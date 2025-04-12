@@ -1,10 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const clientController = require("../controllers/clientController");
+const ClientController = require("../controllers/clientController");
 
-router.get("/get-user-type", clientController.getUserType);
-router.post("/register", clientController.register);
+router.get("/verify/:token", ClientController.activateAccount);
+router.get("/get-user-type", ClientController.getUserType);
+router.post("/register", ClientController.register);
+router.post("/login", ClientController.login);
 
+// router.get("/verify/:token", clientController.activateAccount);
 // const readController = require("../controllers/readController");
 // const nfaFeatureController = require("../controllers/nfaFeatureController");
 // const nfaNonFeatureController = require("../controllers/nfaNonFeatureController");

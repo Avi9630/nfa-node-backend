@@ -14,7 +14,7 @@ const transporter = nodemailer.createTransport({
 });
 
 const Mail = {
-  sendMail: async (mailContent) => {
+  registerMail: async (mailContent) => {
     const { To, Subject, Data } = mailContent;
     const frontendBaseUrl =
       process.env.FRONTEND_BASE_URL ?? "http://119.82.68.149/festival/";
@@ -26,13 +26,6 @@ const Mail = {
       "verify-registration.ejs"
     );
 
-    // Render HTML from EJS template
-    // const htmlContent = await ejs.renderFile(
-    //   templatePath,
-    //   Data,
-    //   frontendBaseUrl
-    // );
-
     const htmlContent = await ejs.renderFile(templatePath, {
       ...Data,
       frontendBaseUrl,
@@ -41,6 +34,38 @@ const Mail = {
     try {
       const info = await transporter.sendMail({
         from: process.env.MAIL_FROM_ADDRESS,
+        to: To,
+        subject: Subject,
+        html: htmlContent,
+      });
+      console.log("Email sent:", info.messageId);
+      return info;
+    } catch (error) {
+      console.error("Error sending email:", error);
+      throw error;
+    }
+  },
+
+  accountActivationMail: async (mailContent) => {
+    const { To, Subject, Data } = mailContent;
+    const frontendBaseUrl =
+      process.env.FRONTEND_BASE_URL ?? "http://119.82.68.149/festival/";
+
+    // Path to the EJS template
+    const templatePath = path.join(
+      __dirname,
+      "templates",
+      "activation-mail.ejs"
+    );
+
+    const htmlContent = await ejs.renderFile(templatePath, {
+      ...Data,
+      frontendBaseUrl,
+    });
+
+    try {
+      const info = await transporter.sendMail({
+        from: process.env.MAIL_FROM,
         to: To,
         subject: Subject,
         html: htmlContent,

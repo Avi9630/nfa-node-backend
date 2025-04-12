@@ -166,8 +166,6 @@ const Client = sequelize.define(
       autoIncrement: true,
       primaryKey: true,
     },
-    usertype: { type: DataTypes.INTEGER, allowNull: false },
-    website_type: { type: DataTypes.INTEGER, allowNull: false },
     first_name: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -201,7 +199,6 @@ const Client = sequelize.define(
       unique: true,
       validate: { isNumeric: true, len: [12, 12] },
     },
-    landline: { type: DataTypes.STRING, allowNull: true },
     address: {
       type: DataTypes.TEXT,
       allowNull: false,
@@ -218,7 +215,11 @@ const Client = sequelize.define(
       allowNull: false,
       validate: { notEmpty: true, len: [6, 255] }, // Ensuring a strong password length
     },
+    landline: { type: DataTypes.STRING, allowNull: true },
+    usertype: { type: DataTypes.INTEGER, allowNull: false },
+    website_type: { type: DataTypes.INTEGER, allowNull: false },
     active: { type: DataTypes.BOOLEAN, defaultValue: false },
+    activated_date: { type: DataTypes.DATE, allowNull: true },
     activate_token: { type: DataTypes.STRING, allowNull: false },
   },
   {
