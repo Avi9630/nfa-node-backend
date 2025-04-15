@@ -1,6 +1,7 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require("../models");
-const bcrypt = require("bcryptjs");
+// const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 
 // const Client = sequelize.define(
 //   "Client",
@@ -249,4 +250,33 @@ const generateUsername = async (usertype) => {
   return `${prefix}${numPart + 1}`;
 };
 
+const fiendByCredential = async (clientEmail, clientPassword) => {
+  const client = await Client.findOne({ where: { email: clientEmail } });
+
+  if (!client) {
+    throw new Error("Unable to get records.!!");
+  }
+
+  // if (!client.active) {
+  //   throw new Error(
+  //     "Account not activated. Please activate your account first!!"
+  //   );
+  //   // return res.status(400).json({ message: "Account not activated" });
+  // }
+
+  const isMatch = await bcrypt.compare(clientPassword, client.password);
+  // const isMatch = await bcrypt.compare(
+  //   "$2b$08$mMGWpdzv3lBWquyqUJuv4Oc96mhcPi9WW6h6e7nhMLn6sGjcPwOMq",
+  //   client.password
+  // );
+  console.log("Password match result:", isMatch);
+
+  if (!isMatch) {
+    throw new Error("Unable to login.!!");
+  }
+  return client;
+};
+
+Client.fiendByCredential = fiendByCredential;
+Client.generateUsername = generateUsername;
 module.exports = { Client, generateUsername };

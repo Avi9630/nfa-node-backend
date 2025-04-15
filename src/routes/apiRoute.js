@@ -6,6 +6,7 @@ router.get("/verify/:token", ClientController.activateAccount);
 router.get("/get-user-type", ClientController.getUserType);
 router.post("/register", ClientController.register);
 router.post("/login", ClientController.login);
+router.post("/verify-email", ClientController.verifyEmail);
 
 // router.get("/verify/:token", clientController.activateAccount);
 // const readController = require("../controllers/readController");

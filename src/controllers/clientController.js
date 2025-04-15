@@ -1,8 +1,10 @@
 const ValidateRegister = require("../helpers/validation_schema");
-const { Client, generateUsername } = require("../models/Client");
+const { Client } = require("../models/Client");
 const Constant = require("../libraries/Constant");
-const bcrypt = require("bcryptjs");
+// const bcrypt = require("bcryptjs");
+const bcrypt = require("bcrypt");
 const Mail = require("../mailer/Mail");
+const { response } = require("express");
 
 const ClientController = {
   getUserType: async (req, res) => {
@@ -18,6 +20,40 @@ const ClientController = {
         status: false,
         message: "Internal Server Error",
         error: error.message,
+      });
+    }
+  },
+
+  verifyEmail: async (req, res) => {
+    const { isValid, errors } = ValidateRegister.validateVerifyEmailInput(
+      req.body
+    );
+
+    if (!isValid) {
+      return res.status(400).json({ errors });
+    }
+
+    try {
+      const client = await Client.findOne({ where: { email: req.body.email } });
+
+      if (!client) {
+        res.status(400).json({
+          status: false,
+          message: "Email not verified.!!",
+        });
+        // throw new Error("Unable to verify email.!!");
+      }
+
+      res.status(200).json({
+        status: true,
+        message: "Email verified successfully.!!",
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: false,
+        // message: "Internal Server Error",
+        // error: error.message,
+        message: error.message || "An unexpected error occured.!!",
       });
     }
   },
@@ -38,7 +74,7 @@ const ClientController = {
 
     try {
       const hashedPassword = await bcrypt.hash(req.body.password, 8);
-      const username = await generateUsername(req.body.usertype);
+      const username = await Client.generateUsername(req.body.usertype);
 
       const newClient = {
         first_name: req.body.first_name,
@@ -126,33 +162,38 @@ const ClientController = {
   },
 
   login: async (req, res) => {
+    // (async () => {
+    //   const testPassword = "password";
+    //   const storedHash =
+    //     "$2b$08$wPCgLshtlSozs9lLOkzcleIxcMM89Y0UunxA/cZe2IblASiXFtVuK";
+    //   console.log("Hash length:", storedHash.length);
+    //   const result = await bcrypt.compare(testPassword, storedHash);
+    //   console.log("Manual match:", result);
+    // })();
+
+    // return "Testing";
+
     const { isValid, errors } = ValidateRegister.loginValidate(req.body);
     if (!isValid) {
       return res.status(400).json({ errors });
     }
 
-    const client = await Client.findOne({ where: { email: req.body.email } });
-    if (!client) {
-      return res.status(400).json({
+    try {
+      const client = await Client.fiendByCredential(
+        req.body.email,
+        req.body.password
+      );
+      res.status(200).json({
+        status: true,
+        message: "Login success.!!",
+        data: client,
+      });
+    } catch (error) {
+      res.status(500).json({
         status: false,
-        message: "Records not found.!!",
-        error: error.message,
+        message: error.message || "An unexpected error occured.!!",
       });
     }
-    if (!client.active) {
-      res.status(400).json({
-        status: false,
-        message: "Please activate your account.!!",
-      });
-    }
-    console.log(client.active);
-
-    //   if (!$client->active) {
-    //     $response = [
-    //         'message' => 'Please activate your account',
-    //     ];
-    //     return $this->response('validatorerrors', $response);
-    // }
   },
 };
 module.exports = ClientController;

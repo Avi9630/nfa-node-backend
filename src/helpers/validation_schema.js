@@ -289,6 +289,19 @@ const ValidateRegister = {
       errors,
     };
   },
+  validateVerifyEmailInput: (data) => {
+    const errors = {};
+    // EMAIL
+    if (!data.email || validator.isEmpty(String(data.email).trim())) {
+      errors.email = "Email is required";
+    } else if (!validator.isEmail(String(data.email).trim())) {
+      errors.email = "Invalid email format";
+    }
+    return {
+      isValid: Object.keys(errors).length === 0,
+      errors,
+    };
+  },
 };
 
 // module.exports = { validateRegisterInput };
