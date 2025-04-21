@@ -1,26 +1,20 @@
 const ValidateRegister = require("../helpers/validation_schema");
-const { Client } = require("../models/Client");
+const responseHelper = require("../helpers/responseHelper");
 const Constant = require("../libraries/Constant");
-// const bcrypt = require("bcryptjs");
-const bcrypt = require("bcrypt");
+const { Client } = require("../models/Client");
 const Mail = require("../mailer/Mail");
-const { response } = require("express");
+const bcrypt = require("bcryptjs");
 
 const ClientController = {
   getUserType: async (req, res) => {
     try {
       const types = Constant.userType();
-      res.status(200).json({
-        status: true,
-        message: "User types fetched successfully",
+      responseHelper(res, "success", {
+        message: "User types fetched successfully.!!",
         data: types,
       });
     } catch (error) {
-      res.status(500).json({
-        status: false,
-        message: "Internal Server Error",
-        error: error.message,
-      });
+      responseHelper(res, "exception", { message: error.message });
     }
   },
 
@@ -28,33 +22,19 @@ const ClientController = {
     const { isValid, errors } = ValidateRegister.validateVerifyEmailInput(
       req.body
     );
-
     if (!isValid) {
-      return res.status(400).json({ errors });
+      responseHelper(res, "validatorerrors", { errors });
     }
-
     try {
       const client = await Client.findOne({ where: { email: req.body.email } });
-
       if (!client) {
-        res.status(400).json({
-          status: false,
-          message: "Email not verified.!!",
-        });
-        // throw new Error("Unable to verify email.!!");
+        throw new Error("No account found with this email address.!!");
       }
-
-      res.status(200).json({
-        status: true,
+      responseHelper(res, "success", {
         message: "Email verified successfully.!!",
       });
     } catch (error) {
-      res.status(500).json({
-        status: false,
-        // message: "Internal Server Error",
-        // error: error.message,
-        message: error.message || "An unexpected error occured.!!",
-      });
+      responseHelper(res, "exception", { message: error.message });
     }
   },
 
@@ -62,20 +42,19 @@ const ClientController = {
     const { isValid, errors } = ValidateRegister.validateInput(req.body);
 
     if (!isValid) {
-      return res.status(400).json({ errors });
+      responseHelper(res, "validatorerrors", { errors });
     }
-
     const { isValid: isDuplicateValid, errors: duplicateErrors } =
       await ValidateRegister.checkDuplicateClient(req.body);
 
     if (!isDuplicateValid) {
-      return res.status(400).json({ errors: duplicateErrors });
+      // return res.status(400).json({ errors: duplicateErrors });
+      responseHelper(res, "validatorerrors", { duplicateErrors });
     }
 
     try {
-      const hashedPassword = await bcrypt.hash(req.body.password, 8);
+      const hashedPassword = await bcrypt.hash(req.body.password, 10);
       const username = await Client.generateUsername(req.body.usertype);
-
       const newClient = {
         first_name: req.body.first_name,
         last_name: req.body.last_name,
@@ -104,34 +83,25 @@ const ClientController = {
           activateToken: newClient.activate_token,
         },
       };
+
       await Mail.registerMail(mailContent);
       await Client.create(newClient);
-      res.status(201).json({
-        status: true,
+      responseHelper(res, "created", {
         message:
           "Thank you for National Film Award (NFA) registration. Please click on the link sent to your email for verification process.!!",
       });
     } catch (error) {
-      res.status(500).json({
-        status: false,
-        message: "Internal Server Error",
-        error: error.message,
-      });
+      responseHelper(res, "exception", { message: error.message });
     }
   },
 
   activateAccount: async (req, res) => {
     const { token } = req.params;
-
     try {
       const client = await Client.findOne({ where: { activate_token: token } });
 
       if (!client) {
-        return res.status(400).json({
-          status: false,
-          message: "Invalid token",
-          error: error.message,
-        });
+        responseHelper(res, "tokenexp", { message: "Invalid token" });
       }
 
       const dataToUpdate = {
@@ -148,51 +118,45 @@ const ClientController = {
         },
       };
       await Mail.accountActivationMail(mailContent);
-      return res.status(200).json({
-        status: true,
-        message: "Account has been activated successfully.!",
+      responseHelper(res, "success", {
+        message: "Account has been activated successfully.!!",
       });
     } catch (error) {
-      return res.status(500).json({
-        status: false,
-        message: "Account not activated, Please re-submit.!",
-        error: error.message,
-      });
+      responseHelper(res, "exception", { message: error.message });
     }
   },
 
   login: async (req, res) => {
-    // (async () => {
-    //   const testPassword = "password";
-    //   const storedHash =
-    //     "$2b$08$wPCgLshtlSozs9lLOkzcleIxcMM89Y0UunxA/cZe2IblASiXFtVuK";
-    //   console.log("Hash length:", storedHash.length);
-    //   const result = await bcrypt.compare(testPassword, storedHash);
-    //   console.log("Manual match:", result);
-    // })();
-
-    // return "Testing";
-
     const { isValid, errors } = ValidateRegister.loginValidate(req.body);
+
     if (!isValid) {
-      return res.status(400).json({ errors });
+      responseHelper(res, "validatorerrors", { errors });
     }
 
     try {
-      const client = await Client.fiendByCredential(
+      const client = await Client.findByCredential(
         req.body.email,
         req.body.password
       );
-      res.status(200).json({
-        status: true,
-        message: "Login success.!!",
-        data: client,
-      });
+
+      const token = await Client.generateAuthToken(client);
+      const authorization = {
+        access_token: token,
+        token_type: "bearer",
+        expires_in: "1h",
+      };
+
+      // 1st to update user
+
+      // client.token = token;
+      // await client.save();
+
+      // 2nd way to update user
+
+      await client.update({ token });
+      responseHelper(res, "success", { authorization, data: client });
     } catch (error) {
-      res.status(500).json({
-        status: false,
-        message: error.message || "An unexpected error occured.!!",
-      });
+      responseHelper(res, "exception", { error: error.message });
     }
   },
 };

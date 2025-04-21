@@ -1,10 +1,8 @@
+const responseHelper = require("../helpers/responseHelper");
+
 const testing = async (req, res) => {
   try {
-    res.status(200).send({
-      status: true,
-      message: "Testing success!!",
-      data: {},
-    });
+    responseHelper(res, "success", { data: {} });
   } catch (error) {
     console.error(error);
     res.status(500).send({

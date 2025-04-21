@@ -1,9 +1,10 @@
-const express = require("express");
-const router = express.Router();
 const ClientController = require("../controllers/clientController");
+const express = require("express");
+const Auth = require("../middleware/auth");
+const router = express.Router();
 
+router.get("/get-user-type", Auth, ClientController.getUserType);
 router.get("/verify/:token", ClientController.activateAccount);
-router.get("/get-user-type", ClientController.getUserType);
 router.post("/register", ClientController.register);
 router.post("/login", ClientController.login);
 router.post("/verify-email", ClientController.verifyEmail);

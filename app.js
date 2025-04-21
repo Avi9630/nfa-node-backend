@@ -1,7 +1,6 @@
 const mySqlPool = require("./src/config/database");
-// const apiRoutes = require("./src/routes/apiRoute");
-const routes = require("./src/routes/route");
 const apiRoutes = require("./src/routes/apiRoute");
+const routes = require("./src/routes/route");
 const express = require("express");
 const dotenv = require("dotenv");
 dotenv.config();
