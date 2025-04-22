@@ -3,6 +3,7 @@ const express = require("express");
 const Auth = require("../middleware/auth");
 const router = express.Router();
 
+// router.get("/get-user-type", Auth, ClientController.getUserType);
 router.get("/get-user-type", Auth, ClientController.getUserType);
 router.get("/verify/:token", ClientController.activateAccount);
 router.post("/register", ClientController.register);

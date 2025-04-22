@@ -66,7 +66,7 @@ const Client = sequelize.define(
     active: { type: DataTypes.BOOLEAN, defaultValue: false },
     activated_date: { type: DataTypes.DATE, allowNull: true },
     activate_token: { type: DataTypes.STRING, allowNull: false },
-    token: { type: DataTypes.STRING, allowNull: false },
+    token: { type: DataTypes.STRING, allowNull: true },
   },
   {
     timestamps: false,

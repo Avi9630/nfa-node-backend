@@ -48,7 +48,6 @@ const ClientController = {
       await ValidateRegister.checkDuplicateClient(req.body);
 
     if (!isDuplicateValid) {
-      // return res.status(400).json({ errors: duplicateErrors });
       responseHelper(res, "validatorerrors", { duplicateErrors });
     }
 
