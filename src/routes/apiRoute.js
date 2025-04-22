@@ -5,10 +5,17 @@ const router = express.Router();
 
 // router.get("/get-user-type", Auth, ClientController.getUserType);
 router.get("/get-user-type", Auth, ClientController.getUserType);
-router.get("/verify/:token", ClientController.activateAccount);
 router.post("/register", ClientController.register);
 router.post("/login", ClientController.login);
+
+//ACTIVATE-ACCOUNT
+router.get("/verify/:token", ClientController.activateAccount);
+
+//VERIFY-EMAIL && RESET-PASSWORD
 router.post("/verify-email", ClientController.verifyEmail);
+router.post("/reset-Password", ClientController.resetPassword);
+router.post("/verify-otp", ClientController.verifyOtp);
+router.post("/change-Password", ClientController.changePassword);
 
 // router.get("/verify/:token", clientController.activateAccount);
 // const readController = require("../controllers/readController");

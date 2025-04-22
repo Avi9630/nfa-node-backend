@@ -16,12 +16,19 @@ const ValidateRegister = {
       errors.first_name = "Last name is required";
     }
 
-    // Email
+    // EMAIL
     if (!data.email || validator.isEmpty(String(data.email).trim())) {
-      errors.email = "Email is required";
+      errors.email = "Email is required.!!";
     } else if (!validator.isEmail(String(data.email).trim())) {
       errors.email = "Invalid email format";
     }
+
+    // // Email
+    // if (!data.email || validator.isEmpty(String(data.email).trim())) {
+    //   errors.email = "Email is required";
+    // } else if (!validator.isEmail(String(data.email).trim())) {
+    //   errors.email = "Invalid email format";
+    // }
 
     // Mobile
     if (!data.mobile || validator.isEmpty(data.mobile.trim())) {
@@ -60,14 +67,19 @@ const ValidateRegister = {
     }
 
     // Password
-    if (!data.password || validator.isEmpty(data.password.trim())) {
+    if (!data.password || validator.isEmpty(String(data.password).trim())) {
       errors.password = "Password is required";
     } else if (!validator.isLength(data.password.trim(), { min: 6 })) {
       errors.password = "Password must be at least 6 characters";
     }
 
     // Confirm password
-    if (data.password.trim() !== data.password_confirmation.trim()) {
+    if (
+      !data.password_confirmation ||
+      validator.isEmpty(data.password_confirmation.trim())
+    ) {
+      errors.password_confirmation = "Password confirmation is required";
+    } else if (data.password.trim() !== data.password_confirmation.trim()) {
       errors.password_confirmation =
         "Password confirmation must match password";
     }
@@ -130,6 +142,20 @@ const ValidateRegister = {
     };
   },
 
+  resetPasswordValidate: (data) => {
+    const errors = {};
+    // EMAIL
+    if (!data.email || validator.isEmpty(String(data.email).trim())) {
+      errors.email = "Email is required";
+    } else if (!validator.isEmail(String(data.email).trim())) {
+      errors.email = "Invalid email format";
+    }
+    return {
+      isValid: Object.keys(errors).length === 0,
+      errors,
+    };
+  },
+
   validateVerifyEmailInput: (data) => {
     const errors = {};
     // EMAIL
@@ -138,6 +164,61 @@ const ValidateRegister = {
     } else if (!validator.isEmail(String(data.email).trim())) {
       errors.email = "Invalid email format";
     }
+    return {
+      isValid: Object.keys(errors).length === 0,
+      errors,
+    };
+  },
+
+  verifyOtpValidate: (data) => {
+    const errors = {};
+
+    // EMAIL
+    if (!data.email || validator.isEmpty(String(data.email).trim())) {
+      errors.email = "Email is required.!!";
+    } else if (!validator.isEmail(String(data.email).trim())) {
+      errors.email = "Invalid email format";
+    }
+
+    // OTP
+    if (!data.otp || validator.isEmpty(String(data.otp).trim())) {
+      errors.otp = "OTP is required.!!";
+    }
+
+    return {
+      isValid: Object.keys(errors).length === 0,
+      errors,
+    };
+  },
+
+  changePasswordValidate: (data) => {
+    const errors = {};
+
+    // EMAIL
+    if (!data.email || validator.isEmpty(String(data.email).trim())) {
+      errors.email = "Email is required.!!";
+    } else if (!validator.isEmail(String(data.email).trim())) {
+      errors.email = "Invalid email format";
+    }
+
+    // Password
+    if (!data.password || validator.isEmpty(String(data.password).trim())) {
+      errors.password = "Password is required";
+    } else if (!validator.isLength(data.password.trim(), { min: 6 })) {
+      errors.password = "Password must be at least 6 characters";
+    }
+
+    // Confirm password
+    if (
+      !data.password_confirmation ||
+      validator.isEmpty(data.password_confirmation.trim())
+    ) {
+      errors.password_confirmation = "Password confirmation is required";
+    } else if (data.password.trim() !== data.password_confirmation.trim()) {
+      errors.password_confirmation =
+        "Password confirmation must match password";
+    }
+
     return {
       isValid: Object.keys(errors).length === 0,
       errors,

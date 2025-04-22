@@ -2,19 +2,22 @@ const ValidateRegister = require("../helpers/validation_schema");
 const responseHelper = require("../helpers/responseHelper");
 const Constant = require("../libraries/Constant");
 const { Client } = require("../models/Client");
+const { Twoauth } = require("../models/Twoauth");
+// const { Client, Twoauth } = require("../models");
 const Mail = require("../mailer/Mail");
 const bcrypt = require("bcryptjs");
+const moment = require("moment");
 
 const ClientController = {
   getUserType: async (req, res) => {
     try {
       const types = Constant.userType();
-      responseHelper(res, "success", {
+      return responseHelper(res, "success", {
         message: "User types fetched successfully.!!",
         data: types,
       });
     } catch (error) {
-      responseHelper(res, "exception", { message: error.message });
+      return responseHelper(res, "exception", { message: error.message });
     }
   },
 
@@ -23,18 +26,18 @@ const ClientController = {
       req.body
     );
     if (!isValid) {
-      responseHelper(res, "validatorerrors", { errors });
+      return responseHelper(res, "validatorerrors", { errors });
     }
     try {
       const client = await Client.findOne({ where: { email: req.body.email } });
       if (!client) {
         throw new Error("No account found with this email address.!!");
       }
-      responseHelper(res, "success", {
+      return responseHelper(res, "success", {
         message: "Email verified successfully.!!",
       });
     } catch (error) {
-      responseHelper(res, "exception", { message: error.message });
+      return responseHelper(res, "exception", { message: error.message });
     }
   },
 
@@ -42,13 +45,13 @@ const ClientController = {
     const { isValid, errors } = ValidateRegister.validateInput(req.body);
 
     if (!isValid) {
-      responseHelper(res, "validatorerrors", { errors });
+      return responseHelper(res, "validatorerrors", { errors });
     }
     const { isValid: isDuplicateValid, errors: duplicateErrors } =
       await ValidateRegister.checkDuplicateClient(req.body);
 
     if (!isDuplicateValid) {
-      responseHelper(res, "validatorerrors", { duplicateErrors });
+      return responseHelper(res, "validatorerrors", { duplicateErrors });
     }
 
     try {
@@ -85,12 +88,12 @@ const ClientController = {
 
       await Mail.registerMail(mailContent);
       await Client.create(newClient);
-      responseHelper(res, "created", {
+      return responseHelper(res, "created", {
         message:
           "Thank you for National Film Award (NFA) registration. Please click on the link sent to your email for verification process.!!",
       });
     } catch (error) {
-      responseHelper(res, "exception", { message: error.message });
+      return responseHelper(res, "exception", { message: error.message });
     }
   },
 
@@ -100,7 +103,7 @@ const ClientController = {
       const client = await Client.findOne({ where: { activate_token: token } });
 
       if (!client) {
-        responseHelper(res, "tokenexp", { message: "Invalid token" });
+        return responseHelper(res, "tokenexp", { message: "Invalid token" });
       }
 
       const dataToUpdate = {
@@ -117,11 +120,11 @@ const ClientController = {
         },
       };
       await Mail.accountActivationMail(mailContent);
-      responseHelper(res, "success", {
+      return responseHelper(res, "success", {
         message: "Account has been activated successfully.!!",
       });
     } catch (error) {
-      responseHelper(res, "exception", { message: error.message });
+      return responseHelper(res, "exception", { message: error.message });
     }
   },
 
@@ -129,7 +132,7 @@ const ClientController = {
     const { isValid, errors } = ValidateRegister.loginValidate(req.body);
 
     if (!isValid) {
-      responseHelper(res, "validatorerrors", { errors });
+      return responseHelper(res, "validatorerrors", { errors });
     }
 
     try {
@@ -139,6 +142,7 @@ const ClientController = {
       );
 
       const token = await Client.generateAuthToken(client);
+
       const authorization = {
         access_token: token,
         token_type: "bearer",
@@ -146,16 +150,154 @@ const ClientController = {
       };
 
       // 1st to update user
-
-      // client.token = token;
-      // await client.save();
-
+      client.token = token;
+      if (client.save()) {
+        return responseHelper(res, "success", { authorization, data: client });
+      }
       // 2nd way to update user
+      // await client.update({ token });
 
-      await client.update({ token });
-      responseHelper(res, "success", { authorization, data: client });
+      return responseHelper(res, "exception", {
+        message: "Something went wrong!! Please contact tech support.!!",
+      });
     } catch (error) {
-      responseHelper(res, "exception", { error: error.message });
+      return responseHelper(res, "exception", { error: error.message });
+    }
+  },
+
+  resetPassword: async (req, res) => {
+    const { isValid, errors } = ValidateRegister.resetPasswordValidate(
+      req.body
+    );
+    if (!isValid) {
+      return responseHelper(res, "validatorerrors", { errors });
+    }
+
+    try {
+      const OTP = Twoauth.generateOtp();
+
+      const client = await Client.findOne({ where: { email: req.body.email } });
+      if (!client) {
+        return responseHelper(res, "notvalid");
+      }
+
+      const twoauth = await Twoauth.findOne({ where: { email: client.email } });
+
+      if (!twoauth) {
+        twoauth = await Twoauth.create({
+          client_id: client.id,
+          mobile: client.mobile,
+          email: client.email,
+          authcode: OTP,
+          is_verifed: "0",
+          ipaddress: req.ip,
+          date: moment().format("YYYY-MM-DD"),
+        });
+      } else {
+        twoauth.authcode = OTP;
+        twoauth.is_verifed = "0";
+        twoauth.ipaddress = req.ip;
+        twoauth.date = moment().format("YYYY-MM-DD");
+        await twoauth.save();
+      }
+
+      const mailContent = {
+        To: req.body.email,
+        Subject: "National Film Awards (NFA) Password Reset - One Time Code",
+        Data: {
+          clientName: client.first_name + " " + client.last_name,
+          otp: OTP,
+        },
+      };
+      await Mail.sendOtp(mailContent);
+      return responseHelper(res, "success", {
+        message: "An OTP has been sent to your registered email address.!!",
+      });
+    } catch (error) {
+      return responseHelper(res, "exception", { error: error.message });
+    }
+  },
+
+  verifyOtp: async (req, res) => {
+    const { isValid, errors } = ValidateRegister.verifyOtpValidate(req.body);
+    if (!isValid) {
+      return responseHelper(res, "validatorerrors", { errors });
+    }
+
+    try {
+      const client = await Client.findOne({ where: { email: req.body.email } });
+
+      if (!client) {
+        return responseHelper(res, "exception", {
+          message: "User Not found.!!",
+        });
+      }
+
+      const authdata = await Twoauth.findOne({
+        where: { client_id: client.id, email: client.email, is_verifed: "0" },
+      });
+
+      if (!authdata) {
+        return responseHelper(res, "exception", {
+          message: "OTP not matched!!, Please resend OTP!!",
+        });
+      }
+
+      if (authdata.authcode !== req.body.otp) {
+        return responseHelper(res, "exception", {
+          message: "Invalid OTP entered.!!",
+        });
+      }
+
+      // Updating OTP verification status
+      const [updated] = await Twoauth.update(
+        { is_verifed: "1" },
+        { where: { id: authdata.id } }
+      );
+
+      if (updated === 1) {
+        return res.status(200).json({
+          status: "success",
+          message: "OTP verified successfully!",
+        });
+      }
+    } catch (error) {
+      return responseHelper(res, "exception", { message: error.message });
+    }
+  },
+
+  changePassword: async (req, res) => {
+    const { isValid, errors } = ValidateRegister.changePasswordValidate(
+      req.body
+    );
+    if (!isValid) {
+      return responseHelper(res, "validatorerrors", { errors });
+    }
+
+    try {
+      const client = await Client.findOne({ where: { email: req.body.email } });
+      if (!client) {
+        return responseHelper(res, "exception", {
+          message: "User not found.!!",
+        });
+      }
+
+      const isMatch = await bcrypt.compare(req.body.password, client.password);
+      if (isMatch) {
+        return responseHelper(res, "incorrectinfo", {
+          message: "Password can not be same as previous password.!!",
+        });
+      }
+      const hashedPassword = await bcrypt.hash(req.body.password, 10);
+      client.password = hashedPassword;
+
+      await client.save(); // ✅ await it
+
+      return responseHelper(res, "success", {
+        message: "Password updated successfully.!!",
+      });
+    } catch (error) {
+      return responseHelper(res, "exception", { message: error.message });
     }
   },
 };

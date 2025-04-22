@@ -14,7 +14,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="./activation-mail.css" />
+    <link rel="stylesheet" href="./send-otp-mail.css" />
   </head>
 
   <body>
@@ -45,7 +45,7 @@
               />
             </div>
             <div class="welNote">
-              <h4>Welcome to the International Film Festival of India!</h4>
+              <h4>OTP for NFA Password Reset</h4>
             </div>
             <hr />
             <table
@@ -55,82 +55,22 @@
               <tbody>
                 <tr>
                   <td>
-                    <p>Hi <%= clientName %>!</p>
-                    <p>We are excited to have you onboard.</p>
+                    <p>Dear <%= clientName %>!</p>
+                    <p>
+                      We received a request to reset your password for your NFA
+                      account. Please use the One-Time Password (OTP) below to
+                      proceed with the password reset:
+                    </p>
+                    <p class="otpNo"><%= otp %></p>
+                    <p>This OTP is valid for 15 minutes.</p>
                     <p style="margin-bottom: 0">
-                      Thank you for registering for the International Film
-                      Festival of India (IFFI) Goa. Here are your details of
-                      registration.
+                      If you did not request a password reset, please ignore
+                      this email.
                     </p>
                   </td>
                 </tr>
                 <tr>
                   <td>
-                    <table>
-                      <tr>
-                        <td>
-                          <p style="margin: 0">Name</p>
-                        </td>
-                        <td>
-                          <p style="margin: 0">:</p>
-                        </td>
-                        <td style="padding-left: 4px">
-                          <p style="margin: 0"><%= clientName %></p>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <p style="margin: 0">Email ID</p>
-                        </td>
-                        <td>
-                          <p style="margin: 0">:</p>
-                        </td>
-                        <td style="padding-left: 4px">
-                          <p style="margin: 0"><%= clientEmail %></p>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <p style="margin: 0">Location</p>
-                        </td>
-                        <td>
-                          <p style="margin: 0">:</p>
-                        </td>
-                        <td style="padding-left: 4px">
-                          <p style="margin: 0">Goa,India</p>
-                        </td>
-                      </tr>
-                    </table>
-                  </td>
-                </tr>
-
-                <tr>
-                  <td>
-                    <p style="display: flex; flex-direction: column; gap: 12px">
-                      <span
-                        >You can find more information about the festival,
-                        including the schedule and venues, on our website.</span
-                      >
-                      <span></span>
-                    </p>
-                  </td>
-                </tr>
-                <br /><br />
-
-                <tr>
-                  <td style="text-align: center">
-                    <a
-                      href="https://www.iffigoa.org/festival/"
-                      class="primary-btn"
-                      >Visit Now</a
-                    >
-                  </td>
-                </tr>
-
-                <br /><br />
-                <tr>
-                  <td>
-                    <br />
                     <p style="display: flex; flex-direction: column; gap: 4px">
                       <span>Best regards,</span>
                       <span>The IFFI Team</span>
@@ -139,7 +79,6 @@
                 </tr>
               </tbody>
             </table>
-
             <table
               style="
                 border-collapse: separate;
@@ -192,7 +131,7 @@
                     <span style="font-weight: 500; color: #202020"
                       >DISCLAIMER CLAUSE</span
                     >
-                    <span
+                    <span>
                       >The contents of e-mail message including attachment/s is
                       confidential and is intended only for the named
                       recipient(s) above and contains information that is
@@ -210,8 +149,8 @@
                       please notify the sender forthwith and delete this email
                       message including attachments from your computer. Neither
                       the sender nor NFDC shall accept any liability for any
-                      damage from the use and/or acceptance of this email.</span
-                    >
+                      damage from the use and/or acceptance of this email.
+                    </span>
                   </p>
                 </td>
               </tr>
