@@ -1,4 +1,4 @@
-const Constant = {
+const CONSTANT = {
   websiteType: () => {
     return {
       IP: 1,
@@ -27,22 +27,19 @@ const Constant = {
     return shuffled.substring(0, length);
   },
 
-  stepsFeature: () => {
-    return {
-      GENRAL: 1,
-      CENSOR: 2,
-      COMPANY_REGISTRATION: 3,
-      PRODUCER: 4,
-      DIRECTOR: 5,
-      ACTORS: 6,
-      SONGS: 7,
-      AUDIOGRAPHER: 8,
-      OTHER: 9,
-      RETURN_ADDRESS: 10,
-      DECLARATION: 11,
-      FINAL_SUBMIT: 12,
-    };
-  },
+  stepsFeature: () => ({
+    GENRAL: "GENERAL",
+    CENSOR: "CENSOR",
+    COMPANY_REGISTRATION: "COMPANY_REGISTRATION",
+    PRODUCER: "PRODUCER",
+    DIRECTOR: "DIRECTOR",
+    ACTORS: "ACTORS",
+    SONGS: "SONGS",
+    AUDIOGRAPHER: "AUDIOGRAPHER",
+    OTHER: "OTHER",
+    RETURN_ADDRESS: "RETURN_ADDRESS",
+    DECLARATION: "DECLARATION",
+  }),
 };
 
-module.exports = Constant;
+module.exports = CONSTANT;

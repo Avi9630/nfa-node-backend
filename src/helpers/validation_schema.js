@@ -1,4 +1,3 @@
-const Joi = require("joi");
 var validator = require("validator");
 const { Client } = require("../models/Client");
 

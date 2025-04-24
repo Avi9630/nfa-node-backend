@@ -31,7 +31,9 @@ const ClientController = {
     try {
       const client = await Client.findOne({ where: { email: req.body.email } });
       if (!client) {
-        throw new Error("No account found with this email address.!!");
+        responseHelper(res, "exception", {
+          message: "No account found with this email address.!!",
+        });
       }
       return responseHelper(res, "success", {
         message: "Email verified successfully.!!",
@@ -299,6 +301,13 @@ const ClientController = {
     } catch (error) {
       return responseHelper(res, "exception", { message: error.message });
     }
+  },
+
+  getClientDetails: async (req, res) => {
+    responseHelper(res, "success", {
+      message: "Loggedin client details.!!",
+      data: req.user,
+    });
   },
 };
 module.exports = ClientController;

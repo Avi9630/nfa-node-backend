@@ -60,6 +60,16 @@ const responseHelper = (res, input = "", params = {}) => {
       status: true,
       message: "Created Successfully!",
     },
+    unprocessableEntity: {
+      statusCode: 422,
+      status: true,
+      message: "Unprocessable Entity!",
+    },
+    badrequest: {
+      statusCode: 422,
+      status: true,
+      message: "Bad request.!!",
+    },
   };
 
   if (statusResp[input]) {

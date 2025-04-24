@@ -12,6 +12,7 @@ const auth = async (req, res, next) => {
     if (!client) {
       throw new Error("Unauthorized user.!!");
     }
+    req.user = client;
     next();
   } catch (error) {
     responseHelper(res, "unauthorized", { error });
