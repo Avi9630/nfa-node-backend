@@ -51,5 +51,6 @@ const Twoauth = sequelize.define(
 
 const generateOtp = () =>
   Math.floor(100000 + Math.random() * 900000).toString();
+
 Twoauth.generateOtp = generateOtp;
 module.exports = { Twoauth };

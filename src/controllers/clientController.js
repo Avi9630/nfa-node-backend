@@ -1,4 +1,4 @@
-const ValidateRegister = require("../helpers/validation_schema");
+const SCHEMA = require("../helpers/validation_schema");
 const responseHelper = require("../helpers/responseHelper");
 const Constant = require("../libraries/Constant");
 const { Client } = require("../models/Client");
@@ -22,9 +22,7 @@ const ClientController = {
   },
 
   verifyEmail: async (req, res) => {
-    const { isValid, errors } = ValidateRegister.validateVerifyEmailInput(
-      req.body
-    );
+    const { isValid, errors } = SCHEMA.validateVerifyEmailInput(req.body);
     if (!isValid) {
       return responseHelper(res, "validatorerrors", { errors });
     }
@@ -44,13 +42,13 @@ const ClientController = {
   },
 
   register: async (req, res) => {
-    const { isValid, errors } = ValidateRegister.validateInput(req.body);
+    const { isValid, errors } = SCHEMA.validateInput(req.body);
 
     if (!isValid) {
       return responseHelper(res, "validatorerrors", { errors });
     }
     const { isValid: isDuplicateValid, errors: duplicateErrors } =
-      await ValidateRegister.checkDuplicateClient(req.body);
+      await SCHEMA.checkDuplicateClient(req.body);
 
     if (!isDuplicateValid) {
       return responseHelper(res, "validatorerrors", { duplicateErrors });
@@ -131,7 +129,7 @@ const ClientController = {
   },
 
   login: async (req, res) => {
-    const { isValid, errors } = ValidateRegister.loginValidate(req.body);
+    const { isValid, errors } = SCHEMA.loginValidate(req.body);
 
     if (!isValid) {
       return responseHelper(res, "validatorerrors", { errors });
@@ -168,9 +166,7 @@ const ClientController = {
   },
 
   resetPassword: async (req, res) => {
-    const { isValid, errors } = ValidateRegister.resetPasswordValidate(
-      req.body
-    );
+    const { isValid, errors } = SCHEMA.resetPasswordValidate(req.body);
     if (!isValid) {
       return responseHelper(res, "validatorerrors", { errors });
     }
@@ -196,6 +192,7 @@ const ClientController = {
           date: moment().format("YYYY-MM-DD"),
         });
       } else {
+        twoauth.client_id = client.id;
         twoauth.authcode = OTP;
         twoauth.is_verifed = "0";
         twoauth.ipaddress = req.ip;
@@ -221,7 +218,7 @@ const ClientController = {
   },
 
   verifyOtp: async (req, res) => {
-    const { isValid, errors } = ValidateRegister.verifyOtpValidate(req.body);
+    const { isValid, errors } = SCHEMA.verifyOtpValidate(req.body);
     if (!isValid) {
       return responseHelper(res, "validatorerrors", { errors });
     }
@@ -236,7 +233,7 @@ const ClientController = {
       }
 
       const authdata = await Twoauth.findOne({
-        where: { client_id: client.id, email: client.email, is_verifed: "0" },
+        where: { client_id: client.id, email: client.email, is_verifed: 0 },
       });
 
       if (!authdata) {
@@ -269,9 +266,7 @@ const ClientController = {
   },
 
   changePassword: async (req, res) => {
-    const { isValid, errors } = ValidateRegister.changePasswordValidate(
-      req.body
-    );
+    const { isValid, errors } = SCHEMA.changePasswordValidate(req.body);
     if (!isValid) {
       return responseHelper(res, "validatorerrors", { errors });
     }

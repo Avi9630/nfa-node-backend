@@ -9,6 +9,15 @@ const Constant = {
     };
   },
 
+  formType: () => {
+    return {
+      FEATURE: 1,
+      NON_FEATURE: 2,
+      BEST_BOOK: 3,
+      BEST_FILM_CRITIC: 4,
+    };
+  },
+
   userType: () => {
     return {
       1: "Producer/Production Company",

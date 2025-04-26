@@ -34,9 +34,9 @@ const NfaFeatureLibrary = {
     return { validatorSchema, messagesArray };
   },
 
-  consumeGENERAL: (payload, user) => {
+  consumeGENERAL: (payload) => {
     return {
-      client_id: user.id,
+      client_id: payload.user.id,
       film_title_roman: payload.film_title_roman,
       film_title_devnagri: payload.film_title_devnagri,
       film_title_english: payload.film_title_english,
@@ -51,6 +51,37 @@ const NfaFeatureLibrary = {
       color_bw: payload.color_bw,
       film_synopsis: payload.film_synopsis || null,
     };
+  },
+
+  CENSOR: () => {
+    const validatorSchema = {
+      last_id: Joi.number().required(),
+      censor_certificate_nom: Joi.string().required(),
+      censor_certificate_date: Joi.string()
+        .pattern(/^\d{4}-\d{2}-\d{2}$/)
+        .required(),
+      censor_certificate_file: Joi.any(),
+    };
+    const messagesArray = {
+      "censor_certificate_date.pattern.base":
+        "The censor certificate date does not match the format (Y-m-d).",
+      "censor_certificate_file.required":
+        "Censor certificate file is required.!!",
+    };
+    return { validatorSchema, messagesArray };
+  },
+
+  consumeCENSOR: (payload) => {
+    const censorFile = payload.files?.find(
+      (file) => file.fieldname === "censor_certificate_file"
+    );
+    const consumeCensor = {
+      last_id: payload.last_id,
+      censor_certificate_nom: payload.censor_certificate_nom || null,
+      censor_certificate_date: payload.censor_certificate_date || null,
+      censor_certificate_file: censorFile,
+    };
+    return consumeCensor;
   },
 };
 

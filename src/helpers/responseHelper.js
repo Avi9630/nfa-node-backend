@@ -68,7 +68,7 @@ const responseHelper = (res, input = "", params = {}) => {
     badrequest: {
       statusCode: 422,
       status: true,
-      message: "Bad request.!!",
+      message: "Bad request!",
     },
   };
 

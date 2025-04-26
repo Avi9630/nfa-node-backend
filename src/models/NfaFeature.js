@@ -1,9 +1,8 @@
-const Joi = require("joi");
+const LibrariesNFAFeature = require("../libraries/NfaFeatureLibrary");
+const CONSTANT = require("../libraries/Constant");
 const { DataTypes } = require("sequelize");
 const sequelize = require("../models");
-const CONSTANT = require("../libraries/Constant");
-const LibrariesNFAFeature = require("../libraries/NfaFeatureLibrary");
-const responseHelper = require("../helpers/responseHelper");
+const Joi = require("joi");
 
 const NfaFeature = sequelize.define(
   "NfaFeature",
@@ -74,6 +73,19 @@ const NfaFeature = sequelize.define(
       type: DataTypes.TINYINT,
       allowNull: true,
     },
+    censor_certificate_nom: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    censor_certificate_date: {
+      type: DataTypes.DATE,
+      allowNull: true,
+    },
+    censor_certificate_file: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+
     created_at: { type: DataTypes.TIME },
     updated_at: { type: DataTypes.TIME },
   },
@@ -127,7 +139,7 @@ const validateData = async (payload) => {
   return { validatorSchema: schema, messagesArray: messages };
 };
 
-const consumeRecords = async (payload, user) => {
+const consumeRecords = async (payload) => {
   const methodMap = {
     [CONSTANT.stepsFeature().GENRAL]: "consumeGENERAL",
     [CONSTANT.stepsFeature().CENSOR]: "consumeCENSOR",
@@ -142,8 +154,9 @@ const consumeRecords = async (payload, user) => {
     [CONSTANT.stepsFeature().RETURN_ADDRESS]: "consumeRETURNADDRESS",
     [CONSTANT.stepsFeature().DECLARATION]: "consumeDECLARATION",
   };
+
   if (methodMap[payload.step]) {
-    return LibrariesNFAFeature[methodMap[payload.step]](payload, user);
+    return LibrariesNFAFeature[methodMap[payload.step]](payload);
   }
   return {};
 };

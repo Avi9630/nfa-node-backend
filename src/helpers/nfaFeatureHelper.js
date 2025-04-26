@@ -1,10 +1,8 @@
 const validator = require("validator");
-
 const CONSTANT = require("../libraries/Constant");
-const { INTEGER } = require("sequelize");
 
 const NfaFeatureHelper = {
-  validateStepInput: (payload) => {
+  validateStepInput: (payload, files) => {
     const errors = {};
     const step = payload.step;
 
@@ -12,9 +10,6 @@ const NfaFeatureHelper = {
     if (!step || !validator.isInt(step)) {
       errors.step = "Step is required and must be a number.";
     }
-
-    // console.log(typeof CONSTANT.stepsFeature().GENRAL);
-    // return "From Helper";
 
     // Step-based conditional validation
     if (step && step !== String(CONSTANT.stepsFeature().GENRAL)) {
@@ -24,7 +19,6 @@ const NfaFeatureHelper = {
     }
 
     //GENRAL
-
     if (step === String(CONSTANT.stepsFeature().GENRAL)) {
       if (
         !payload.film_title_roman ||
@@ -101,15 +95,47 @@ const NfaFeatureHelper = {
       }
     }
 
-    // Validation for PRODUCER step
-    // if (String(step) === String(CONSTANT.stepsFeature().PRODUCER)) {
-    //   if (
-    //     !payload.producer_name ||
-    //     validator.isEmpty(payload.producer_name.trim())
-    //   ) {
-    //     errors.producer_name = "Producer name is required.";
-    //   }
-    // }
+    //CENSOR
+    if (String(step) === String(CONSTANT.stepsFeature().CENSOR)) {
+      if (!payload.last_id || isNaN(payload.last_id)) {
+        errors.last_id = "Last ID is required and must be a number.";
+      }
+
+      if (!payload.censor_certificate_nom?.trim()) {
+        errors.censor_certificate_nom =
+          "Censor Certificate Number is required.";
+      }
+
+      if (
+        !payload.censor_certificate_date ||
+        !validator.isDate(payload.censor_certificate_date, {
+          format: "YYYY-MM-DD",
+          strictMode: true,
+        })
+      ) {
+        errors.censor_certificate_date =
+          "Censor Certificate Date is required and must be in YYYY-MM-DD format.";
+      }
+
+      // Additional check: Ensure the date isn't in the future
+      const certificateDate = new Date(payload.censor_certificate_date);
+      const today = new Date();
+      if (certificateDate > today) {
+        errors.censor_certificate_date =
+          "Censor Certificate Date cannot be in the future.";
+      }
+
+      const censorFile = files?.find(
+        (file) => file.fieldname === "censor_certificate_file"
+      );
+
+      if (censorFile) {
+        if (typeof censorFile !== "object" || !censorFile.mimetype) {
+          errors.censor_certificate_file =
+            "Censor Certificate must be a valid file.";
+        }
+      }
+    }
 
     // More step cases...
 
