@@ -137,7 +137,180 @@ const NfaFeatureHelper = {
       }
     }
 
-    // More step cases...
+    //COMPANY REGISTRATION
+    if (String(step) === String(CONSTANT.stepsFeature().COMPANY_REGISTRATION)) {
+      if (!payload.last_id || isNaN(payload.last_id)) {
+        errors.last_id = "Last ID is required and must be a number.";
+      }
+
+      if (
+        !payload.company_reg_details ||
+        validator.isEmpty(payload.company_reg_details.trim())
+      ) {
+        errors.company_reg_details =
+          "Company registration details field is required.";
+      }
+
+      const censorFile = files?.find(
+        (file) => file.fieldname === "company_reg_doc"
+      );
+
+      if (censorFile) {
+        if (typeof censorFile !== "object" || !censorFile.mimetype) {
+          errors.company_reg_doc = "Company register doc must be a valid file.";
+        }
+      }
+    }
+
+    //OTHERS
+    if (String(step) === String(CONSTANT.stepsFeature().OTHER)) {
+      if (!payload.last_id || isNaN(payload.last_id)) {
+        errors.last_id = "Last ID is required and must be a number.";
+      }
+
+      if (
+        !payload.original_screenplay_name ||
+        validator.isEmpty(payload.original_screenplay_name.trim())
+      ) {
+        errors.original_screenplay_name =
+          "Original screenplay name is required.";
+      }
+
+      if (
+        !payload.adapted_screenplay_name ||
+        validator.isEmpty(payload.adapted_screenplay_name.trim())
+      ) {
+        errors.adapted_screenplay_name = "Adapted screenplay name is required.";
+      }
+
+      if (
+        !payload.story_writer_name ||
+        validator.isEmpty(payload.story_writer_name.trim())
+      ) {
+        errors.story_writer_name = "Story writer name is required.";
+      }
+
+      if (
+        payload.work_under_public_domain !== undefined &&
+        payload.work_under_public_domain !== null &&
+        !["1", "2", 1, 2].includes(payload.work_under_public_domain)
+      ) {
+        errors.work_under_public_domain =
+          "Public domain must be 1 or 2 if provided.";
+      }
+
+      if (
+        payload.shot_digital_video_format !== undefined &&
+        payload.shot_digital_video_format !== null &&
+        !["1", "2", 1, 2].includes(payload.shot_digital_video_format)
+      ) {
+        errors.shot_digital_video_format =
+          "Short digital must be 1 or 2 if provided.";
+      }
+
+      const censorFile = files?.find(
+        (file) => file.fieldname === "original_work_copy"
+      );
+
+      if (censorFile) {
+        if (typeof censorFile !== "object" || !censorFile.mimetype) {
+          errors.original_work_copy = "Work copy must be a valid file.";
+        }
+      }
+    }
+
+    //RETURN_ADDRESS
+    if (String(step) === String(CONSTANT.stepsFeature().RETURN_ADDRESS)) {
+      if (!payload.last_id || isNaN(payload.last_id)) {
+        errors.last_id = "Last ID is required and must be a number.";
+      }
+
+      if (
+        !payload.return_name ||
+        validator.isEmpty(payload.return_name.trim())
+      ) {
+        errors.return_name = "Return name is required.";
+      }
+
+      if (
+        !payload.return_email ||
+        validator.isEmpty(String(payload.return_email).trim())
+      ) {
+        errors.return_email = "Return email is required";
+      } else if (!validator.isEmail(String(payload.return_email).trim())) {
+        errors.return_email = "Invalid return email format";
+      }
+
+      if (
+        !payload.return_mobile ||
+        validator.isEmpty(payload.return_mobile.trim())
+      ) {
+        errors.return_mobile = "Mobile is required";
+      } else if (!validator.isMobilePhone(payload.return_mobile, "en-IN")) {
+        errors.return_mobile = "Mobile must be a valid 10-digit Indian number";
+      }
+
+      if (
+        !payload.return_address ||
+        validator.isEmpty(payload.return_address.trim())
+      ) {
+        errors.return_address = "Return address is required.";
+      }
+
+      if (
+        !payload.return_pincode ||
+        validator.isEmpty(payload.return_pincode.trim())
+      ) {
+        errors.return_pincode = "Return pincode is required";
+      } else if (!validator.matches(payload.return_pincode, /^\d{6}$/)) {
+        errors.return_pincode = "Return pincode must be 6 digits";
+      }
+
+      if (payload.return_fax !== undefined && payload.return_fax !== null) {
+        errors.return_fax = "Return fax must be valid input.!!";
+      }
+
+      if (
+        payload.return_website !== undefined &&
+        payload.return_website !== null
+      ) {
+        errors.return_website = "Return website must be valid input.!!";
+      }
+    }
+
+    //DECLARATION
+    if (String(step) === String(CONSTANT.stepsFeature().DECLARATION)) {
+      if (!payload.last_id || isNaN(payload.last_id)) {
+        errors.last_id = "Last ID is required and must be a number.";
+      }
+
+      if (!["1", 1].includes(payload.declaration_one)) {
+        errors.declaration_one = "Declaration is must be Yes(1).!!";
+      }
+      if (!["1", 1].includes(payload.declaration_two)) {
+        errors.declaration_two = "Declaration is must be Yes(1).!!";
+      }
+      if (!["1", 1].includes(payload.declaration_three)) {
+        errors.declaration_three = "Declaration is must be Yes(1).!!";
+      }
+      if (!["1", 1].includes(payload.declaration_four)) {
+        errors.declaration_four = "Declaration is must be Yes(1).!!";
+      }
+      if (!["1", 1].includes(payload.declaration_five)) {
+        errors.declaration_five = "Declaration is must be Yes(1).!!";
+      }
+      if (!["1", 1].includes(payload.declaration_six)) {
+        errors.declaration_six = "Declaration is must be Yes(1).!!";
+      }
+      if (!["1", 1].includes(payload.declaration_seven)) {
+        errors.declaration_seven = "Declaration is must be Yes(1).!!";
+      }
+      if (!["1", 1].includes(payload.declaration_eight)) {
+        errors.declaration_eight = "Declaration is must be Yes(1).!!";
+      }
+    }
+
+    // More steps to go
 
     return {
       isValid: Object.keys(errors).length === 0,

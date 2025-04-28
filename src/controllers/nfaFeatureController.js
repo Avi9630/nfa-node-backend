@@ -6,129 +6,6 @@ const CONSTANT = require("../libraries/Constant");
 const NfaFeatureHelper = require("../helpers/nfaFeatureHelper");
 
 const nfaFeatureController = {
-  // Entry: async (req, res) => {
-  //   const payload = req.body;
-  //   // const payload = {
-  //   //   ...req.body,
-  //   //   user: req.user,
-  //   // };
-
-  //   // if (
-  //   //   payload.film_synopsis &&
-  //   //   payload.film_synopsis.split(/\s+/).length > 150
-  //   // ) {
-  //   //   return res.status(422).json({
-  //   //     status: "error",
-  //   //     message: "The film synopsis must not exceed 150 words.",
-  //   //   });
-  //   // }
-
-  //   const { validatorSchema, messages } = await NfaFeature.validateData(
-  //     payload
-  //   );
-
-  //   const { error } = validatorSchema.validate(payload, { abortEarly: false });
-  //   if (error) {
-  //     responseHelper(res, "validatorerrors", {
-  //       message: error.details.reduce((acc, curr) => {
-  //         acc[curr.context.key] = curr.message;
-  //         return acc;
-  //       }, {}),
-  //     });
-  //   }
-  //   return;
-
-  //   try {
-  //     const user = req.user;
-  //     const data = await NfaFeature.consumeRecords(payload, user);
-  //     data.step = payload.step;
-
-  //     if (data.step === 1) {
-  //       const user = await Client.findOne({ where: { id: data.client_id } });
-  //       if (user.usertype !== 1) {
-  //         responseHelper(res, "notvalid", {
-  //           message: "You are not a valid user to fill this form.!!",
-  //         });
-  //       }
-  //     }
-
-  //     const stepHandlers = {
-  //       [CONSTANT.stepsFeature().GENRAL]: async (data, payload, user) =>
-  //         await nfaFeatureController.handleGeneralStep(data, payload, user),
-
-  //       [CONSTANT.stepsFeature().CENSOR]: async (data, payload, user) =>
-  //         await handleCensorStep(data, payload, user),
-
-  //       [CONSTANT.stepsFeature().COMPANY_REGISTRATION]: async (
-  //         data,
-  //         payload,
-  //         user
-  //       ) => await handleCompanyRegistrationStep(data, payload, user),
-
-  //       [CONSTANT.stepsFeature().PRODUCER]: async (data, payload, user) =>
-  //         await handleProducerStep(data, payload, user),
-
-  //       [CONSTANT.stepsFeature().DIRECTOR]: async (data, payload, user) =>
-  //         await handleDirectorStep(data, payload, user),
-
-  //       [CONSTANT.stepsFeature().ACTORS]: async (data, payload, user) =>
-  //         await handleActorsStep(data, payload, user),
-
-  //       [CONSTANT.stepsFeature().SONGS]: async (data, payload, user) =>
-  //         await handleSongsStep(data, payload, user),
-
-  //       [CONSTANT.stepsFeature().AUDIOGRAPHER]: async (data, payload, user) =>
-  //         await handleAudiographerStep(data, payload, user),
-
-  //       [CONSTANT.stepsFeature().OTHER]: async (data, payload, user) =>
-  //         await handleOtherStep(data, payload, user),
-
-  //       [CONSTANT.stepsFeature().RETURN_ADDRESS]: async (data, payload, user) =>
-  //         await handleReturnAddressStep(data, payload, user),
-
-  //       [CONSTANT.stepsFeature().DECLARATION]: async (data, payload, user) =>
-  //         await handleDeclarationStep(data, payload, user),
-  //     };
-
-  //     if (stepHandlers[data.step]) {
-  //       // return await stepHandlers[data.step](payload, data, req.user.id);
-  //       const result = await stepHandlers[data.step](
-  //         payload,
-  //         data,
-  //         req.user.id
-  //       );
-
-  //       // if (result?.status === "created") {
-  //       //   // responseHelper(res, `'${result?.status}'`, { result });
-  //       //   return res.status(201).json(result.data);
-  //       // }
-  //       // if (result?.status === "exception") {
-  //       //   return res.status(422).json(result.data);
-  //       // }
-
-  //       if (result?.status === "created") {
-  //         return responseHelper(res, "created", {
-  //           message: result?.data?.message || "Created successfully.",
-  //           data: result?.data?.record || result.data,
-  //         });
-  //       }
-
-  //       if (result?.status === "exception") {
-  //         return responseHelper(res, "unprocessable", {
-  //           message:
-  //             result?.data?.message || "There was an issue with your request.",
-  //           errors: result?.data?.errors || {},
-  //         });
-  //       }
-  //       return res.status(200).json(result);
-  //     }
-
-  //     responseHelper(res, "badrequest", { message: "Invalid step provided" });
-  //   } catch (error) {
-  //     responseHelper(res, "exception", { message: error.message });
-  //   }
-  // },
-
   Entry: async (req, res) => {
     const files = req.files;
     const { isValid, errors } = NfaFeatureHelper.validateStepInput(
@@ -140,22 +17,18 @@ const nfaFeatureController = {
       return responseHelper(res, "validatorerrors", { errors });
     }
 
-    // console.log(files);
-    // console.log(req.body);
-    // return "From Controller";
-
     try {
-      // const payload = req.body;
-      // const user = req.user;
       const payload = {
         ...req.body,
         user: req.user,
         files: req.files,
       };
+
       const data = await NfaFeature.consumeRecords(payload);
       data.step = payload.step;
 
-      if (data.step === 1) {
+      if (data.step === "1") {
+        console.log("Hii");
         const user = await Client.findOne({ where: { id: data.client_id } });
         if (user.usertype !== 1) {
           responseHelper(res, "notvalid", {
@@ -163,9 +36,6 @@ const nfaFeatureController = {
           });
         }
       }
-
-      // console.log(data);
-      // return "From Controller";
 
       const stepHandlers = {
         [CONSTANT.stepsFeature().GENRAL]: async (data, payload) =>
@@ -175,31 +45,34 @@ const nfaFeatureController = {
           await nfaFeatureController.handleCensorStep(data, payload),
 
         [CONSTANT.stepsFeature().COMPANY_REGISTRATION]: async (data, payload) =>
-          await handleCompanyRegistrationStep(data, payload),
+          await nfaFeatureController.handleCompanyRegistrationStep(
+            data,
+            payload
+          ),
 
         [CONSTANT.stepsFeature().PRODUCER]: async (data, payload) =>
-          await handleProducerStep(data, payload),
+          await nfaFeatureController.handleProducerStep(data, payload),
 
         [CONSTANT.stepsFeature().DIRECTOR]: async (data, payload) =>
-          await handleDirectorStep(data, payload),
+          await nfaFeatureController.handleDirectorStep(data, payload),
 
         [CONSTANT.stepsFeature().ACTORS]: async (data, payload) =>
-          await handleActorsStep(data, payload),
+          await nfaFeatureController.handleActorsStep(data, payload),
 
         [CONSTANT.stepsFeature().SONGS]: async (data, payload) =>
-          await handleSongsStep(data, payload),
+          await nfaFeatureController.handleSongsStep(data, payload),
 
         [CONSTANT.stepsFeature().AUDIOGRAPHER]: async (data, payload) =>
-          await handleAudiographerStep(data, payload),
+          await nfaFeatureController.handleAudiographerStep(data, payload),
 
         [CONSTANT.stepsFeature().OTHER]: async (data, payload) =>
-          await handleOtherStep(data, payload),
+          await nfaFeatureController.handleOtherStep(data, payload),
 
         [CONSTANT.stepsFeature().RETURN_ADDRESS]: async (data, payload) =>
-          await handleReturnAddressStep(data, payload),
+          await nfaFeatureController.handleReturnAddressStep(data, payload),
 
         [CONSTANT.stepsFeature().DECLARATION]: async (data, payload) =>
-          await handleDeclarationStep(data, payload),
+          await nfaFeatureController.handleDeclarationStep(data, payload),
       };
 
       if (stepHandlers[data.step]) {
@@ -227,7 +100,10 @@ const nfaFeatureController = {
         }
         return res.status(200).json(result);
       }
-      responseHelper(res, "badrequest", { message: "Invalid step provided" });
+
+      responseHelper(res, "badrequest", {
+        message: "Invalid step provided.!!",
+      });
     } catch (error) {
       responseHelper(res, "exception", { message: error.message });
     }
@@ -247,6 +123,7 @@ const nfaFeatureController = {
           message: "Please provide valid details to update.!!",
         };
       }
+
       if (
         !checkForm.active_step ||
         checkForm.active_step < CONSTANT.stepsFeature().GENRAL
@@ -260,19 +137,16 @@ const nfaFeatureController = {
         data: update,
       };
     }
-
-    payload.active_step = payload.step;
-    create = await NfaFeature.createFeature(payload);
+    data.active_step = payload.step;
+    create = await NfaFeature.createFeature(data);
     return {
       status: "created",
       data: { message: "Feature form created.!!", record: create },
     };
   },
 
-  handleCensorStep: async (data, payload, user) => {
+  handleCensorStep: async (data, payload) => {
     const lastId = payload.last_id;
-    // console.log(payload);
-    // return "From Controller : handleCensorStep";
     if (lastId) {
       const checkForm = await NfaFeature.findOne({
         where: { client_id: payload.user.id, id: lastId },
@@ -316,6 +190,58 @@ const nfaFeatureController = {
       } else {
         data.censor_certificate_file = null;
       }
+      update = await checkForm.update(data);
+      return {
+        status: "success",
+        message: "Records updated successfully.!!",
+        data: update,
+      };
+    }
+  },
+
+  handleCompanyRegistrationStep: async (data, payload) => {
+    const lastId = payload.last_id;
+    if (lastId) {
+      const checkForm = await NfaFeature.findOne({
+        where: { client_id: payload.user.id, id: lastId },
+      });
+
+      if (!checkForm) {
+        return {
+          status: "updateError",
+          message: "Please provide valid details to update.!!",
+        };
+      }
+
+      if (
+        !checkForm.active_step ||
+        checkForm.active_step < CONSTANT.stepsFeature().COMPANY_REGISTRATION
+      ) {
+        data.active_step = CONSTANT.stepsFeature().COMPANY_REGISTRATION;
+      }
+      if (payload.files && Array.isArray(payload.files)) {
+        const censorFile = payload.files.find(
+          (file) => file.fieldname === "company_reg_doc"
+        );
+        if (censorFile) {
+          const fileUpload = await ImageLib.imageUpload({
+            id: lastId,
+            image_key: "company_reg_doc",
+            websiteType: "NFA",
+            formType: "FEATURE",
+            image: censorFile,
+          });
+
+          if (!fileUpload.status) {
+            return response("exception", { message: "Image not uploaded.!!" });
+          }
+          data.company_reg_doc = censorFile.originalname ?? null;
+        } else {
+          data.company_reg_doc = null;
+        }
+      } else {
+        data.company_reg_doc = null;
+      }
 
       update = await checkForm.update(data);
       return {
@@ -326,40 +252,257 @@ const nfaFeatureController = {
     }
   },
 
-  handleCompanyRegistrationStep: async (data, payload, user) => {
-    console.log("From handleCompanyRegistrationStep  Step");
-  },
-
   handleProducerStep: async (data, payload, user) => {
-    console.log("From handleProducerStep  Step");
+    const lastId = payload.last_id;
+
+    const checkForm = await NfaFeature.findOne({
+      where: { client_id: payload.user.id, id: lastId },
+    });
+
+    if (!checkForm) {
+      return {
+        status: "updateError",
+        message: "Please provide valid details to update.!!",
+      };
+    }
+
+    if (
+      !checkForm.active_step ||
+      checkForm.active_step < CONSTANT.stepsFeature().PRODUCER
+    ) {
+      data.active_step = CONSTANT.stepsFeature().PRODUCER;
+    }
+    update = await checkForm.update(data);
+    return {
+      status: "success",
+      message: "Records updated successfully.!!",
+      data: update,
+    };
   },
 
   handleDirectorStep: async (data, payload, user) => {
-    console.log("From handleDirectorStep  Step");
+    const lastId = payload.last_id;
+
+    const checkForm = await NfaFeature.findOne({
+      where: { client_id: payload.user.id, id: lastId },
+    });
+
+    if (!checkForm) {
+      return {
+        status: "updateError",
+        message: "Please provide valid details to update.!!",
+      };
+    }
+
+    if (
+      !checkForm.active_step ||
+      checkForm.active_step < CONSTANT.stepsFeature().PRODUCER
+    ) {
+      data.active_step = CONSTANT.stepsFeature().PRODUCER;
+    }
+    update = await checkForm.update(data);
+    return {
+      status: "success",
+      message: "Records updated successfully.!!",
+      data: update,
+    };
   },
 
   handleActorsStep: async (data, payload, user) => {
-    console.log("From handleActorsStep  Step");
+    const lastId = payload.last_id;
+
+    const checkForm = await NfaFeature.findOne({
+      where: { client_id: payload.user.id, id: lastId },
+    });
+
+    if (!checkForm) {
+      return {
+        status: "updateError",
+        message: "Please provide valid details to update.!!",
+      };
+    }
+
+    if (
+      !checkForm.active_step ||
+      checkForm.active_step < CONSTANT.stepsFeature().PRODUCER
+    ) {
+      data.active_step = CONSTANT.stepsFeature().PRODUCER;
+    }
+    update = await checkForm.update(data);
+    return {
+      status: "success",
+      message: "Records updated successfully.!!",
+      data: update,
+    };
   },
 
   handleSongsStep: async (data, payload, user) => {
-    console.log("From handleSongsStep  Step");
+    const lastId = payload.last_id;
+
+    const checkForm = await NfaFeature.findOne({
+      where: { client_id: payload.user.id, id: lastId },
+    });
+
+    if (!checkForm) {
+      return {
+        status: "updateError",
+        message: "Please provide valid details to update.!!",
+      };
+    }
+
+    if (
+      !checkForm.active_step ||
+      checkForm.active_step < CONSTANT.stepsFeature().PRODUCER
+    ) {
+      data.active_step = CONSTANT.stepsFeature().PRODUCER;
+    }
+    update = await checkForm.update(data);
+    return {
+      status: "success",
+      message: "Records updated successfully.!!",
+      data: update,
+    };
   },
 
   handleAudiographerStep: async (data, payload, user) => {
-    console.log("From handleAudiographerStep  Step");
+    const lastId = payload.last_id;
+
+    const checkForm = await NfaFeature.findOne({
+      where: { client_id: payload.user.id, id: lastId },
+    });
+
+    if (!checkForm) {
+      return {
+        status: "updateError",
+        message: "Please provide valid details to update.!!",
+      };
+    }
+
+    if (
+      !checkForm.active_step ||
+      checkForm.active_step < CONSTANT.stepsFeature().PRODUCER
+    ) {
+      data.active_step = CONSTANT.stepsFeature().PRODUCER;
+    }
+    update = await checkForm.update(data);
+    return {
+      status: "success",
+      message: "Records updated successfully.!!",
+      data: update,
+    };
   },
 
   handleOtherStep: async (data, payload, user) => {
-    console.log("From handleOtherStep  Step");
+    const lastId = payload.last_id;
+
+    const checkForm = await NfaFeature.findOne({
+      where: { client_id: payload.user.id, id: lastId },
+    });
+
+    if (!checkForm) {
+      return {
+        status: "updateError",
+        message: "Please provide valid details to update.!!",
+      };
+    }
+
+    if (
+      !checkForm.active_step ||
+      checkForm.active_step < CONSTANT.stepsFeature().OTHER
+    ) {
+      data.active_step = CONSTANT.stepsFeature().OTHER;
+    }
+
+    if (payload.files && Array.isArray(payload.files)) {
+      const otherFile = payload.files.find(
+        (file) => file.fieldname === "original_work_copy"
+      );
+
+      if (otherFile) {
+        const fileUpload = await ImageLib.imageUpload({
+          id: lastId,
+          image_key: "original_work_copy",
+          websiteType: "NFA",
+          formType: "FEATURE",
+          image: otherFile,
+        });
+
+        if (!fileUpload.status) {
+          return response("exception", { message: "Image not uploaded.!!" });
+        }
+
+        data.original_work_copy = otherFile.originalname ?? null;
+      } else {
+        data.original_work_copy = null;
+      }
+    } else {
+      data.censor_certificate_file = null;
+    }
+
+    update = await checkForm.update(data);
+    return {
+      status: "success",
+      message: "Records updated successfully.!!",
+      data: update,
+    };
   },
 
   handleReturnAddressStep: async (data, payload, user) => {
-    console.log("From handleReturnAddressStep  Step");
+    const lastId = payload.last_id;
+
+    const checkForm = await NfaFeature.findOne({
+      where: { client_id: payload.user.id, id: lastId },
+    });
+
+    if (!checkForm) {
+      return {
+        status: "updateError",
+        message: "Please provide valid details to update.!!",
+      };
+    }
+
+    if (
+      !checkForm.active_step ||
+      checkForm.active_step < CONSTANT.stepsFeature().RETURN_ADDRESS
+    ) {
+      data.active_step = CONSTANT.stepsFeature().RETURN_ADDRESS;
+    }
+
+    update = await checkForm.update(data);
+    return {
+      status: "success",
+      message: "Records updated successfully.!!",
+      data: update,
+    };
   },
 
   handleDeclarationStep: async (data, payload, user) => {
-    console.log("From handleDeclarationStep  Step");
+    const lastId = payload.last_id;
+
+    const checkForm = await NfaFeature.findOne({
+      where: { client_id: payload.user.id, id: lastId },
+    });
+
+    if (!checkForm) {
+      return {
+        status: "updateError",
+        message: "Please provide valid details to update.!!",
+      };
+    }
+
+    if (
+      !checkForm.active_step ||
+      checkForm.active_step < CONSTANT.stepsFeature().DECLARATION
+    ) {
+      data.active_step = CONSTANT.stepsFeature().DECLARATION;
+    }
+
+    update = await checkForm.update(data);
+    return {
+      status: "success",
+      message: "Records updated successfully.!!",
+      data: update,
+    };
   },
 };
 

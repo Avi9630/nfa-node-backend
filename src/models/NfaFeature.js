@@ -85,6 +85,150 @@ const NfaFeature = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    company_reg_details: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    company_reg_doc: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    title_registratin_detils: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    original_screenplay_name: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    original_screenplay_name: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    adapted_screenplay_name: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    story_writer_name: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    work_under_public_domain: {
+      type: DataTypes.TINYINT,
+      allowNull: true,
+    },
+    original_work_copy: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    dialogue: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    cinemetographer: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    editor: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    costume_designer: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    animator: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    stunt_choreographer: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    music_director: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    special_effect_creator: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    shot_digital_video_format: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    production_designer: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    make_up_director: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    choreographer: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    return_name: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    return_email: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    return_mobile: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    return_address: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    return_fax: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    return_pincode: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    return_website: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
+    declaration_one: {
+      type: DataTypes.TINYINT,
+      allowNull: false,
+    },
+    declaration_two: {
+      type: DataTypes.TINYINT,
+      allowNull: false,
+    },
+    declaration_three: {
+      type: DataTypes.TINYINT,
+      allowNull: false,
+    },
+    declaration_four: {
+      type: DataTypes.TINYINT,
+      allowNull: false,
+    },
+    declaration_five: {
+      type: DataTypes.TINYINT,
+      allowNull: false,
+    },
+    declaration_six: {
+      type: DataTypes.TINYINT,
+      allowNull: false,
+    },
+    declaration_seven: {
+      type: DataTypes.TINYINT,
+      allowNull: false,
+    },
+    declaration_eight: {
+      type: DataTypes.TINYINT,
+      allowNull: false,
+    },
 
     created_at: { type: DataTypes.TIME },
     updated_at: { type: DataTypes.TIME },
@@ -162,7 +306,6 @@ const consumeRecords = async (payload) => {
 };
 
 const createFeature = async (data) => {
-  // const create = await NfaFeature.create(data);
   try {
     const created = await NfaFeature.create(data);
     if (!created) {

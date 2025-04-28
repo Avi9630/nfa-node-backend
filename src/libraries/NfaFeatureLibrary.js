@@ -1,38 +1,38 @@
 const Joi = require("joi");
 
 const NfaFeatureLibrary = {
-  GENRAL: () => {
-    const validatorSchema = {
-      last_id: Joi.number().optional(),
-      film_title_roman: Joi.string().required(),
-      film_title_devnagri: Joi.string().required(),
-      film_title_english: Joi.string().required(),
-      language: Joi.string().required(),
-      english_subtitle: Joi.valid(0, 1).required(),
-      director_debut: Joi.valid(0, 1).required(),
-      nom_reels_tapes: Joi.number().optional(),
-      aspect_ratio: Joi.string()
-        .pattern(/^\d+(:\d+)?$/)
-        .required(),
-      format: Joi.valid(1, 2, 3).required(),
-      sound_system: Joi.valid(1, 2, 3, 4).required(),
-      running_time: Joi.string()
-        .pattern(/^\d+(:\d+)?$/)
-        .required(),
-      color_bw: Joi.valid(1, 2).required(),
-      film_synopsis: Joi.string().optional(),
-    };
+  // GENRAL: () => {
+  //   const validatorSchema = {
+  //     last_id: Joi.number().optional(),
+  //     film_title_roman: Joi.string().required(),
+  //     film_title_devnagri: Joi.string().required(),
+  //     film_title_english: Joi.string().required(),
+  //     language: Joi.string().required(),
+  //     english_subtitle: Joi.valid(0, 1).required(),
+  //     director_debut: Joi.valid(0, 1).required(),
+  //     nom_reels_tapes: Joi.number().optional(),
+  //     aspect_ratio: Joi.string()
+  //       .pattern(/^\d+(:\d+)?$/)
+  //       .required(),
+  //     format: Joi.valid(1, 2, 3).required(),
+  //     sound_system: Joi.valid(1, 2, 3, 4).required(),
+  //     running_time: Joi.string()
+  //       .pattern(/^\d+(:\d+)?$/)
+  //       .required(),
+  //     color_bw: Joi.valid(1, 2).required(),
+  //     film_synopsis: Joi.string().optional(),
+  //   };
 
-    const messagesArray = {
-      "english_subtitle.any.only": "English Subtitle must be 0 or 1",
-      "director_debut.any.only": "Director debut must be 0 or 1",
-      "color_bw.any.only": "Color/Black&White must be 1 or 2",
-      "aspect_ratio.pattern.base": "Aspect ratio must be like 10:10 or 10",
-      "running_time.pattern.base": "Running time must be like 10:10 or 10",
-    };
+  //   const messagesArray = {
+  //     "english_subtitle.any.only": "English Subtitle must be 0 or 1",
+  //     "director_debut.any.only": "Director debut must be 0 or 1",
+  //     "color_bw.any.only": "Color/Black&White must be 1 or 2",
+  //     "aspect_ratio.pattern.base": "Aspect ratio must be like 10:10 or 10",
+  //     "running_time.pattern.base": "Running time must be like 10:10 or 10",
+  //   };
 
-    return { validatorSchema, messagesArray };
-  },
+  //   return { validatorSchema, messagesArray };
+  // },
 
   consumeGENERAL: (payload) => {
     return {
@@ -53,23 +53,23 @@ const NfaFeatureLibrary = {
     };
   },
 
-  CENSOR: () => {
-    const validatorSchema = {
-      last_id: Joi.number().required(),
-      censor_certificate_nom: Joi.string().required(),
-      censor_certificate_date: Joi.string()
-        .pattern(/^\d{4}-\d{2}-\d{2}$/)
-        .required(),
-      censor_certificate_file: Joi.any(),
-    };
-    const messagesArray = {
-      "censor_certificate_date.pattern.base":
-        "The censor certificate date does not match the format (Y-m-d).",
-      "censor_certificate_file.required":
-        "Censor certificate file is required.!!",
-    };
-    return { validatorSchema, messagesArray };
-  },
+  // CENSOR: () => {
+  //   const validatorSchema = {
+  //     last_id: Joi.number().required(),
+  //     censor_certificate_nom: Joi.string().required(),
+  //     censor_certificate_date: Joi.string()
+  //       .pattern(/^\d{4}-\d{2}-\d{2}$/)
+  //       .required(),
+  //     censor_certificate_file: Joi.any(),
+  //   };
+  //   const messagesArray = {
+  //     "censor_certificate_date.pattern.base":
+  //       "The censor certificate date does not match the format (Y-m-d).",
+  //     "censor_certificate_file.required":
+  //       "Censor certificate file is required.!!",
+  //   };
+  //   return { validatorSchema, messagesArray };
+  // },
 
   consumeCENSOR: (payload) => {
     const censorFile = payload.files?.find(
@@ -82,6 +82,95 @@ const NfaFeatureLibrary = {
       censor_certificate_file: censorFile,
     };
     return consumeCensor;
+  },
+
+  consumeCOMPANYREGISTRATION: (payload) => {
+    const censorFile = payload.files?.find(
+      (file) => file.fieldname === "company_reg_doc"
+    );
+    const consumeCensor = {
+      last_id: payload.last_id,
+      company_reg_details: payload.company_reg_details || null,
+      company_reg_doc: censorFile,
+      title_registratin_detils: payload.title_registratin_detils || null,
+    };
+    return consumeCensor;
+  },
+
+  consumePRODUCER: (payload) => {
+    return payload;
+  },
+
+  consumeDIRECTOR: (payload) => {
+    return payload;
+  },
+
+  consumeACTORS: (payload) => {
+    return payload;
+  },
+
+  consumeSONGS: (payload) => {
+    return payload;
+  },
+
+  consumeAUDIOGRAPHER: (payload) => {
+    return payload;
+  },
+
+  consumeOTHER: (payload) => {
+    const originalWorkCopyFile = payload.files?.find(
+      (file) => file.fieldname === "original_work_copy"
+    );
+    const consumeOTHER = {
+      last_id: payload.last_id,
+      original_screenplay_name: payload.original_screenplay_name || null,
+      adapted_screenplay_name: payload.adapted_screenplay_name || null,
+      story_writer_name: payload.story_writer_name || null,
+      work_under_public_domain: payload.work_under_public_domain || null,
+      original_work_copy: originalWorkCopyFile,
+      dialogue: payload.dialogue || null,
+      cinemetographer: payload.cinemetographer || null,
+      editor: payload.editor || null,
+      costume_designer: payload.costume_designer || null,
+      animator: payload.animator || null,
+      stunt_choreographer: payload.stunt_choreographer || null,
+      music_director: payload.music_director || null,
+      special_effect_creator: payload.special_effect_creator || null,
+      shot_digital_video_format: payload.shot_digital_video_format || null,
+      production_designer: payload.production_designer || null,
+      make_up_director: payload.make_up_director || null,
+      choreographer: payload.choreographer || null,
+    };
+    return consumeOTHER;
+  },
+
+  consumeRETURNADDRESS: (payload) => {
+    const consumeOTHER = {
+      last_id: payload.last_id,
+      return_name: payload.return_name || null,
+      return_email: payload.return_email || null,
+      return_mobile: payload.return_mobile || null,
+      return_address: payload.return_address || null,
+      return_pincode: payload.return_pincode,
+      return_fax: payload.return_fax || null,
+      return_website: payload.return_website || null,
+    };
+    return consumeOTHER;
+  },
+
+  consumeDECLARATION: (payload) => {
+    const consumeOTHER = {
+      last_id: payload.last_id,
+      declaration_one: payload.declaration_one || null,
+      declaration_two: payload.declaration_two || null,
+      declaration_three: payload.declaration_three || null,
+      declaration_four: payload.declaration_four || null,
+      declaration_five: payload.declaration_five,
+      declaration_six: payload.declaration_six || null,
+      declaration_seven: payload.declaration_seven || null,
+      declaration_eight: payload.declaration_eight || null,
+    };
+    return consumeOTHER;
   },
 };
 
