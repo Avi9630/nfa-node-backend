@@ -2,6 +2,7 @@ const ClientController = require("../controllers/clientController");
 const NfaFeatureController = require("../controllers/nfaFeatureController");
 const express = require("express");
 const Auth = require("../middleware/auth");
+const NfaNonFeatureController = require("../controllers/nfaNonFeatureController");
 const router = express.Router();
 
 //CLIENTS
@@ -9,10 +10,13 @@ const router = express.Router();
 
 //*********************FORM-ENTRY-FEATURE**************************//
 
+// FEATURE
 router.post("/feature-entry", NfaFeatureController.Entry);
+router.post("/feature-final-submit", NfaFeatureController.finalSubmit);
 
-// router.post("/feature-final-submit", NfaFeatureController.submit);
-// router.get("/feature-entry-by/{id}", NfaFeatureController.featureById);
+// NON-FEATURE
+router.post("/non-feature-entry", NfaNonFeatureController.Entry);
+router.post("/non-feature-final-submit", NfaNonFeatureController.finalSubmit);
 
 //CLIENTS
 // $router->post('get-client-details',             ['uses' =>  'ClientController@getClientDetails']);

@@ -3,13 +3,14 @@ const { NfaFeature } = require("../models/NfaFeature");
 const { Client } = require("../models/Client");
 const ImageLib = require("../libraries/ImageLib");
 const CONSTANT = require("../libraries/Constant");
-const NfaFeatureHelper = require("../helpers/nfaFeatureHelper");
+const NfaNonFeatureHelper = require("../helpers/nfaNonFeatureHelper");
+const { NfaNonFeature } = require("../models/NfaNonFeature");
 // const Mail = require("../mailer/Mail");
 
-const nfaFeatureController = {
+const nfaNonFeatureController = {
   Entry: async (req, res) => {
     const files = req.files;
-    const { isValid, errors } = NfaFeatureHelper.validateStepInput(
+    const { isValid, errors } = NfaNonFeatureHelper.validateStepInput(
       req.body,
       files
     );
@@ -25,56 +26,55 @@ const nfaFeatureController = {
         files: req.files,
       };
 
-      const data = await NfaFeature.consumeRecords(payload);
+      const data = await NfaNonFeature.consumeRecords(payload);
       data.step = payload.step;
 
+      // console.log(data);
+      // return "From Controller";
+
       const user = await Client.findOne({ where: { id: payload.user.id } });
-      if (user.usertype !== 1) {
+      if (user.usertype !== 2) {
         responseHelper(res, "notvalid", {
           message: "You are not a valid user to fill this form.!!",
         });
       }
 
       const stepHandlers = {
-        [CONSTANT.stepsFeature().GENRAL]: async (data, payload) =>
-          await nfaFeatureController.handleGeneralStep(data, payload),
+        [CONSTANT.stepsNonFeature().GENRAL]: async (data, payload) =>
+          await nfaNonFeatureController.handleGeneralStep(data, payload),
 
-        [CONSTANT.stepsFeature().CENSOR]: async (data, payload) =>
-          await nfaFeatureController.handleCensorStep(data, payload),
+        [CONSTANT.stepsNonFeature().CENSOR]: async (data, payload) =>
+          await nfaNonFeatureController.handleCensorStep(data, payload),
 
-        [CONSTANT.stepsFeature().COMPANY_REGISTRATION]: async (data, payload) =>
-          await nfaFeatureController.handleCompanyRegistrationStep(
+        [CONSTANT.stepsNonFeature().COMPANY_REGISTRATION]: async (
+          data,
+          payload
+        ) =>
+          await nfaNonFeatureController.handleCompanyRegistrationStep(
             data,
             payload
           ),
 
-        [CONSTANT.stepsFeature().PRODUCER]: async (data, payload) =>
-          await nfaFeatureController.handleProducerStep(data, payload),
+        [CONSTANT.stepsNonFeature().PRODUCER]: async (data, payload) =>
+          await nfaNonFeatureController.handleProducerStep(data, payload),
 
-        [CONSTANT.stepsFeature().DIRECTOR]: async (data, payload) =>
-          await nfaFeatureController.handleDirectorStep(data, payload),
+        [CONSTANT.stepsNonFeature().DIRECTOR]: async (data, payload) =>
+          await nfaNonFeatureController.handleDirectorStep(data, payload),
 
-        [CONSTANT.stepsFeature().ACTORS]: async (data, payload) =>
-          await nfaFeatureController.handleActorsStep(data, payload),
+        [CONSTANT.stepsNonFeature().OTHER]: async (data, payload) =>
+          await nfaNonFeatureController.handleOtherStep(data, payload),
 
-        [CONSTANT.stepsFeature().SONGS]: async (data, payload) =>
-          await nfaFeatureController.handleSongsStep(data, payload),
+        [CONSTANT.stepsNonFeature().RETURN_ADDRESS]: async (data, payload) =>
+          await nfaNonFeatureController.handleReturnAddressStep(data, payload),
 
-        [CONSTANT.stepsFeature().AUDIOGRAPHER]: async (data, payload) =>
-          await nfaFeatureController.handleAudiographerStep(data, payload),
-
-        [CONSTANT.stepsFeature().OTHER]: async (data, payload) =>
-          await nfaFeatureController.handleOtherStep(data, payload),
-
-        [CONSTANT.stepsFeature().RETURN_ADDRESS]: async (data, payload) =>
-          await nfaFeatureController.handleReturnAddressStep(data, payload),
-
-        [CONSTANT.stepsFeature().DECLARATION]: async (data, payload) =>
-          await nfaFeatureController.handleDeclarationStep(data, payload),
+        [CONSTANT.stepsNonFeature().DECLARATION]: async (data, payload) =>
+          await nfaNonFeatureController.handleDeclarationStep(data, payload),
       };
 
       if (stepHandlers[data.step]) {
         const result = await stepHandlers[data.step](data, payload);
+        console.log(result);
+        return "Result";
 
         if (result?.status === "created") {
           return responseHelper(res, "created", {
@@ -136,7 +136,7 @@ const nfaFeatureController = {
       };
     }
     data.active_step = payload.step;
-    create = await NfaFeature.createFeature(data);
+    create = await NfaNonFeature.createNonFeature(data);
     return {
       status: "created",
       data: { message: "Feature form created.!!", record: create },
@@ -504,7 +504,7 @@ const nfaFeatureController = {
   },
 
   finalSubmit: async (req, res) => {
-    const { isValid, errors } = NfaFeatureHelper.finalSubmitStep(req.body);
+    const { isValid, errors } = NfaNonFeatureHelper.finalSubmitStep(req.body);
     if (!isValid) {
       return responseHelper(res, "validatorerrors", { errors });
     }
@@ -553,4 +553,4 @@ const nfaFeatureController = {
   },
 };
 
-module.exports = nfaFeatureController;
+module.exports = nfaNonFeatureController;

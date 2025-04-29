@@ -52,6 +52,20 @@ const Constant = {
       FINAL_SUBMIT: 12,
     };
   },
+
+  stepsNonFeature: () => {
+    return {
+      GENRAL: 1,
+      CENSOR: 2,
+      COMPANY_REGISTRATION: 3,
+      PRODUCER: 4,
+      DIRECTOR: 5,
+      OTHER: 6,
+      RETURN_ADDRESS: 7,
+      DECLARATION: 8,
+      FINAL_SUBMIT: 9,
+    };
+  },
 };
 
 module.exports = Constant;

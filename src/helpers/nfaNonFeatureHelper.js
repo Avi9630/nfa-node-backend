@@ -1,7 +1,7 @@
 const validator = require("validator");
 const CONSTANT = require("../libraries/Constant");
 
-const NfaFeatureHelper = {
+const NfaNonFeatureHelper = {
   validateStepInput: (payload, files) => {
     const errors = {};
     const step = payload.step;
@@ -330,4 +330,4 @@ const NfaFeatureHelper = {
   },
 };
 
-module.exports = NfaFeatureHelper;
+module.exports = NfaNonFeatureHelper;
