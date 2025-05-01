@@ -7,6 +7,8 @@ const { Twoauth } = require("../models/Twoauth");
 const Mail = require("../mailer/Mail");
 const bcrypt = require("bcryptjs");
 const moment = require("moment");
+const { NfaFeature } = require("../models/NfaFeature");
+const { NfaNonFeature } = require("../models/NfaNonFeature");
 
 const ClientController = {
   getUserType: async (req, res) => {
@@ -303,6 +305,66 @@ const ClientController = {
       message: "Loggedin client details.!!",
       data: req.user,
     });
+  },
+
+  entryDelete: async (req, res) => {
+    try {
+      nfaFeature = await NfaFeature.findOne({
+        where: { id: req.params.id, client_id: req.user.id },
+      });
+      if (!nfaFeature) {
+        throw Error("Records not found.!!");
+      }
+      await nfaFeature.delete();
+      responseHelper(res, "success", { message: "Deleted successfully.!!" });
+    } catch (error) {
+      responseHelper(res, "exception", { message: error.message });
+    }
+  },
+
+  entryList: async (req, res) => {
+    try {
+      if (req.user.usertype === 1) {
+        feature = await NfaFeature.findAll({
+          where: { client_id: req.user.id },
+        });
+        nonFeature = await NfaNonFeature.findAll({
+          where: { client_id: req.user.id },
+        });
+
+        // data.feature = feature;
+        // data.nonFeature = nonFeature;
+
+        responseHelper(res, "success", {
+          message: "Here are your records.!!",
+          data: {
+            Feature: feature,
+            "Non Feature": nonFeature,
+          },
+        });
+      }
+
+      if (req.user.usertype === 2) {
+        // feature = await NfaFeature.findAll({
+        //   where: { client_id: req.user.id },
+        // });
+        // nonFeature = await NfaNonFeature.findAll({
+        //   where: { client_id: req.user.id },
+        // });
+
+        data.bestBook = {};
+        data.bestFilmCritic = {};
+
+        responseHelper(res, "success", {
+          message: "Here are your records.!!",
+          data: data,
+        });
+      }
+
+      throw Error("User not valid.!!");
+    } catch (error) {
+      responseHelper(res, "exception", { message: error.message });
+    }
   },
 };
 module.exports = ClientController;

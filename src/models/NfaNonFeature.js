@@ -161,10 +161,10 @@ const NfaNonFeature = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
-    make_up_director: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
+    // make_up_director: {
+    //   type: DataTypes.STRING,
+    //   allowNull: true,
+    // },
     choreographer: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -291,9 +291,9 @@ const consumeRecords = async (payload) => {
       "consumeCOMPANYREGISTRATION",
     [CONSTANT.stepsNonFeature().PRODUCER]: "consumePRODUCER",
     [CONSTANT.stepsNonFeature().DIRECTOR]: "consumeDIRECTOR",
-    [CONSTANT.stepsNonFeature().ACTORS]: "consumeACTORS",
-    [CONSTANT.stepsNonFeature().SONGS]: "consumeSONGS",
-    [CONSTANT.stepsNonFeature().AUDIOGRAPHER]: "consumeAUDIOGRAPHER",
+    // [CONSTANT.stepsNonFeature().ACTORS]: "consumeACTORS",
+    // [CONSTANT.stepsNonFeature().SONGS]: "consumeSONGS",
+    // [CONSTANT.stepsNonFeature().AUDIOGRAPHER]: "consumeAUDIOGRAPHER",
     [CONSTANT.stepsNonFeature().OTHER]: "consumeOTHER",
     [CONSTANT.stepsNonFeature().RETURN_ADDRESS]: "consumeRETURNADDRESS",
     [CONSTANT.stepsNonFeature().DECLARATION]: "consumeDECLARATION",

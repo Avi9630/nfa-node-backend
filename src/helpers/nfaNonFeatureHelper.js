@@ -19,7 +19,7 @@ const NfaNonFeatureHelper = {
     }
 
     //GENRAL
-    if (step === String(CONSTANT.stepsFeature().GENRAL)) {
+    if (step === String(CONSTANT.stepsNonFeature().GENRAL)) {
       if (
         !payload.film_title_roman ||
         validator.isEmpty(payload.film_title_roman.trim())
@@ -96,7 +96,7 @@ const NfaNonFeatureHelper = {
     }
 
     //CENSOR
-    if (String(step) === String(CONSTANT.stepsFeature().CENSOR)) {
+    if (String(step) === String(CONSTANT.stepsNonFeature().CENSOR)) {
       if (!payload.last_id || isNaN(payload.last_id)) {
         errors.last_id = "Last ID is required and must be a number.";
       }
@@ -138,7 +138,9 @@ const NfaNonFeatureHelper = {
     }
 
     //COMPANY REGISTRATION
-    if (String(step) === String(CONSTANT.stepsFeature().COMPANY_REGISTRATION)) {
+    if (
+      String(step) === String(CONSTANT.stepsNonFeature().COMPANY_REGISTRATION)
+    ) {
       if (!payload.last_id || isNaN(payload.last_id)) {
         errors.last_id = "Last ID is required and must be a number.";
       }
@@ -163,41 +165,41 @@ const NfaNonFeatureHelper = {
     }
 
     //OTHERS
-    if (String(step) === String(CONSTANT.stepsFeature().OTHER)) {
+    if (String(step) === String(CONSTANT.stepsNonFeature().OTHER)) {
       if (!payload.last_id || isNaN(payload.last_id)) {
         errors.last_id = "Last ID is required and must be a number.";
       }
 
-      if (
-        !payload.original_screenplay_name ||
-        validator.isEmpty(payload.original_screenplay_name.trim())
-      ) {
-        errors.original_screenplay_name =
-          "Original screenplay name is required.";
-      }
+      // if (
+      //   !payload.original_screenplay_name ||
+      //   validator.isEmpty(payload.original_screenplay_name.trim())
+      // ) {
+      //   errors.original_screenplay_name =
+      //     "Original screenplay name is required.";
+      // }
 
-      if (
-        !payload.adapted_screenplay_name ||
-        validator.isEmpty(payload.adapted_screenplay_name.trim())
-      ) {
-        errors.adapted_screenplay_name = "Adapted screenplay name is required.";
-      }
+      // if (
+      //   !payload.adapted_screenplay_name ||
+      //   validator.isEmpty(payload.adapted_screenplay_name.trim())
+      // ) {
+      //   errors.adapted_screenplay_name = "Adapted screenplay name is required.";
+      // }
 
-      if (
-        !payload.story_writer_name ||
-        validator.isEmpty(payload.story_writer_name.trim())
-      ) {
-        errors.story_writer_name = "Story writer name is required.";
-      }
+      // if (
+      //   !payload.story_writer_name ||
+      //   validator.isEmpty(payload.story_writer_name.trim())
+      // ) {
+      //   errors.story_writer_name = "Story writer name is required.";
+      // }
 
-      if (
-        payload.work_under_public_domain !== undefined &&
-        payload.work_under_public_domain !== null &&
-        !["1", "2", 1, 2].includes(payload.work_under_public_domain)
-      ) {
-        errors.work_under_public_domain =
-          "Public domain must be 1 or 2 if provided.";
-      }
+      // if (
+      //   payload.work_under_public_domain !== undefined &&
+      //   payload.work_under_public_domain !== null &&
+      //   !["1", "2", 1, 2].includes(payload.work_under_public_domain)
+      // ) {
+      //   errors.work_under_public_domain =
+      //     "Public domain must be 1 or 2 if provided.";
+      // }
 
       if (
         payload.shot_digital_video_format !== undefined &&
@@ -208,19 +210,19 @@ const NfaNonFeatureHelper = {
           "Short digital must be 1 or 2 if provided.";
       }
 
-      const censorFile = files?.find(
-        (file) => file.fieldname === "original_work_copy"
-      );
+      // const censorFile = files?.find(
+      //   (file) => file.fieldname === "original_work_copy"
+      // );
 
-      if (censorFile) {
-        if (typeof censorFile !== "object" || !censorFile.mimetype) {
-          errors.original_work_copy = "Work copy must be a valid file.";
-        }
-      }
+      // if (censorFile) {
+      //   if (typeof censorFile !== "object" || !censorFile.mimetype) {
+      //     errors.original_work_copy = "Work copy must be a valid file.";
+      //   }
+      // }
     }
 
     //RETURN_ADDRESS
-    if (String(step) === String(CONSTANT.stepsFeature().RETURN_ADDRESS)) {
+    if (String(step) === String(CONSTANT.stepsNonFeature().RETURN_ADDRESS)) {
       if (!payload.last_id || isNaN(payload.last_id)) {
         errors.last_id = "Last ID is required and must be a number.";
       }
@@ -279,7 +281,7 @@ const NfaNonFeatureHelper = {
     }
 
     //DECLARATION
-    if (String(step) === String(CONSTANT.stepsFeature().DECLARATION)) {
+    if (String(step) === String(CONSTANT.stepsNonFeature().DECLARATION)) {
       if (!payload.last_id || isNaN(payload.last_id)) {
         errors.last_id = "Last ID is required and must be a number.";
       }

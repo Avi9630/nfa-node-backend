@@ -10,11 +10,12 @@ const ImageLib = {
     try {
       const websiteType = CONSTANT.websiteType()[data.websiteType] || null;
       const formType = CONSTANT.formType()[data.formType] || null;
+
       if (!websiteType || !formType) {
         return false;
       }
 
-      const image = data.image; // Should be a Multer file object
+      const image = data.image;
       const originalName = image.originalname;
       const fileName = path.parse(originalName).name;
       const extension = path.extname(originalName);
@@ -30,7 +31,8 @@ const ImageLib = {
         fs.mkdirSync(directory, { recursive: true });
       }
       const filePath = path.join(directory, modifiedName);
-      fs.writeFileSync(filePath, image.buffer); // Save file locally
+      fs.writeFileSync(filePath, image.buffer);
+
       const documentType =
         Document.documentType()[data.image_key.toUpperCase()] || null;
 
@@ -55,6 +57,7 @@ const ImageLib = {
       };
 
       const response = await Document.storeImage(args, fileDetails);
+
       if (response && response.status) {
         return response;
       }

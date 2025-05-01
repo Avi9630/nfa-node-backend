@@ -1,11 +1,9 @@
+const NfaNonFeatureHelper = require("../helpers/nfaNonFeatureHelper");
 const responseHelper = require("../helpers/responseHelper");
-const { NfaFeature } = require("../models/NfaFeature");
-const { Client } = require("../models/Client");
+const { NfaNonFeature } = require("../models/NfaNonFeature");
 const ImageLib = require("../libraries/ImageLib");
 const CONSTANT = require("../libraries/Constant");
-const NfaNonFeatureHelper = require("../helpers/nfaNonFeatureHelper");
-const { NfaNonFeature } = require("../models/NfaNonFeature");
-// const Mail = require("../mailer/Mail");
+const { Client } = require("../models/Client");
 
 const nfaNonFeatureController = {
   Entry: async (req, res) => {
@@ -29,11 +27,8 @@ const nfaNonFeatureController = {
       const data = await NfaNonFeature.consumeRecords(payload);
       data.step = payload.step;
 
-      // console.log(data);
-      // return "From Controller";
-
       const user = await Client.findOne({ where: { id: payload.user.id } });
-      if (user.usertype !== 2) {
+      if (user.usertype !== 1) {
         responseHelper(res, "notvalid", {
           message: "You are not a valid user to fill this form.!!",
         });
@@ -73,8 +68,6 @@ const nfaNonFeatureController = {
 
       if (stepHandlers[data.step]) {
         const result = await stepHandlers[data.step](data, payload);
-        console.log(result);
-        return "Result";
 
         if (result?.status === "created") {
           return responseHelper(res, "created", {
@@ -96,11 +89,17 @@ const nfaNonFeatureController = {
             errors: result?.error || {},
           });
         }
-        return responseHelper(res, "success", { data: result });
+
+        if (result?.status === "success") {
+          return responseHelper(res, "success", {
+            message: result?.message,
+            data: result?.data || {},
+          });
+        }
       }
 
       responseHelper(res, "badrequest", {
-        message: "Invalid step provided.!!",
+        message: "Something went wrong.!!",
       });
     } catch (error) {
       responseHelper(res, "exception", { message: error.message });
@@ -124,9 +123,9 @@ const nfaNonFeatureController = {
 
       if (
         !checkForm.active_step ||
-        checkForm.active_step < CONSTANT.stepsFeature().GENRAL
+        checkForm.active_step < CONSTANT.stepsNonFeature().GENRAL
       ) {
-        data.active_step = CONSTANT.stepsFeature().GENRAL;
+        data.active_step = CONSTANT.stepsNonFeature().GENRAL;
       }
       update = await checkForm.update(data);
       return {
@@ -145,8 +144,9 @@ const nfaNonFeatureController = {
 
   handleCensorStep: async (data, payload) => {
     const lastId = payload.last_id;
+
     if (lastId) {
-      const checkForm = await NfaFeature.findOne({
+      const checkForm = await NfaNonFeature.findOne({
         where: { client_id: payload.user.id, id: lastId },
       });
 
@@ -159,21 +159,22 @@ const nfaNonFeatureController = {
 
       if (
         !checkForm.active_step ||
-        checkForm.active_step < CONSTANT.stepsFeature().CENSOR
+        checkForm.active_step < CONSTANT.stepsNonFeature().CENSOR
       ) {
-        data.active_step = CONSTANT.stepsFeature().CENSOR;
+        data.active_step = CONSTANT.stepsNonFeature().CENSOR;
       }
 
       if (payload.files && Array.isArray(payload.files)) {
         const censorFile = payload.files.find(
           (file) => file.fieldname === "censor_certificate_file"
         );
+
         if (censorFile) {
           const fileUpload = await ImageLib.imageUpload({
             id: lastId,
             image_key: "censor_certificate_file",
             websiteType: "NFA",
-            formType: "FEATURE",
+            formType: "NON_FEATURE",
             image: censorFile,
           });
 
@@ -188,6 +189,7 @@ const nfaNonFeatureController = {
       } else {
         data.censor_certificate_file = null;
       }
+
       update = await checkForm.update(data);
       return {
         status: "success",
@@ -199,61 +201,9 @@ const nfaNonFeatureController = {
 
   handleCompanyRegistrationStep: async (data, payload) => {
     const lastId = payload.last_id;
-    if (lastId) {
-      const checkForm = await NfaFeature.findOne({
-        where: { client_id: payload.user.id, id: lastId },
-      });
 
-      if (!checkForm) {
-        return {
-          status: "updateError",
-          message: "Please provide valid details to update.!!",
-        };
-      }
-
-      if (
-        !checkForm.active_step ||
-        checkForm.active_step < CONSTANT.stepsFeature().COMPANY_REGISTRATION
-      ) {
-        data.active_step = CONSTANT.stepsFeature().COMPANY_REGISTRATION;
-      }
-      if (payload.files && Array.isArray(payload.files)) {
-        const censorFile = payload.files.find(
-          (file) => file.fieldname === "company_reg_doc"
-        );
-        if (censorFile) {
-          const fileUpload = await ImageLib.imageUpload({
-            id: lastId,
-            image_key: "company_reg_doc",
-            websiteType: "NFA",
-            formType: "FEATURE",
-            image: censorFile,
-          });
-
-          if (!fileUpload.status) {
-            return response("exception", { message: "Image not uploaded.!!" });
-          }
-          data.company_reg_doc = censorFile.originalname ?? null;
-        } else {
-          data.company_reg_doc = null;
-        }
-      } else {
-        data.company_reg_doc = null;
-      }
-
-      update = await checkForm.update(data);
-      return {
-        status: "success",
-        message: "Records updated successfully.!!",
-        data: update,
-      };
-    }
-  },
-
-  handleProducerStep: async (data, payload, user) => {
-    const lastId = payload.last_id;
-
-    const checkForm = await NfaFeature.findOne({
+    // if (lastId) {
+    const checkForm = await NfaNonFeature.findOne({
       where: { client_id: payload.user.id, id: lastId },
     });
 
@@ -266,9 +216,63 @@ const nfaNonFeatureController = {
 
     if (
       !checkForm.active_step ||
-      checkForm.active_step < CONSTANT.stepsFeature().PRODUCER
+      checkForm.active_step < CONSTANT.stepsNonFeature().COMPANY_REGISTRATION
     ) {
-      data.active_step = CONSTANT.stepsFeature().PRODUCER;
+      data.active_step = CONSTANT.stepsNonFeature().COMPANY_REGISTRATION;
+    }
+
+    if (payload.files && Array.isArray(payload.files)) {
+      const censorFile = payload.files.find(
+        (file) => file.fieldname === "company_reg_doc"
+      );
+
+      if (censorFile) {
+        const fileUpload = await ImageLib.imageUpload({
+          id: lastId,
+          image_key: "company_reg_doc",
+          websiteType: "NFA",
+          formType: "NON_FEATURE",
+          image: censorFile,
+        });
+        if (!fileUpload.status) {
+          return response("exception", { message: "Image not uploaded.!!" });
+        }
+        data.company_reg_doc = censorFile.originalname ?? null;
+      } else {
+        data.company_reg_doc = null;
+      }
+    } else {
+      data.company_reg_doc = null;
+    }
+
+    update = await checkForm.update(data);
+    return {
+      status: "success",
+      message: "Records updated successfully.!!",
+      data: update,
+    };
+    // }
+  },
+
+  handleProducerStep: async (data, payload, user) => {
+    const lastId = payload.last_id;
+
+    const checkForm = await NfaNonFeature.findOne({
+      where: { client_id: payload.user.id, id: lastId },
+    });
+
+    if (!checkForm) {
+      return {
+        status: "updateError",
+        message: "Please provide valid details to update.!!",
+      };
+    }
+
+    if (
+      !checkForm.active_step ||
+      checkForm.active_step < CONSTANT.stepsNonFeature().PRODUCER
+    ) {
+      data.active_step = CONSTANT.stepsNonFeature().PRODUCER;
     }
     update = await checkForm.update(data);
     return {
@@ -281,7 +285,7 @@ const nfaNonFeatureController = {
   handleDirectorStep: async (data, payload, user) => {
     const lastId = payload.last_id;
 
-    const checkForm = await NfaFeature.findOne({
+    const checkForm = await NfaNonFeature.findOne({
       where: { client_id: payload.user.id, id: lastId },
     });
 
@@ -294,9 +298,9 @@ const nfaNonFeatureController = {
 
     if (
       !checkForm.active_step ||
-      checkForm.active_step < CONSTANT.stepsFeature().PRODUCER
+      checkForm.active_step < CONSTANT.stepsNonFeature().PRODUCER
     ) {
-      data.active_step = CONSTANT.stepsFeature().PRODUCER;
+      data.active_step = CONSTANT.stepsNonFeature().PRODUCER;
     }
     update = await checkForm.update(data);
     return {
@@ -306,94 +310,94 @@ const nfaNonFeatureController = {
     };
   },
 
-  handleActorsStep: async (data, payload, user) => {
-    const lastId = payload.last_id;
+  // handleActorsStep: async (data, payload, user) => {
+  //   const lastId = payload.last_id;
 
-    const checkForm = await NfaFeature.findOne({
-      where: { client_id: payload.user.id, id: lastId },
-    });
+  //   const checkForm = await NfaFeature.findOne({
+  //     where: { client_id: payload.user.id, id: lastId },
+  //   });
 
-    if (!checkForm) {
-      return {
-        status: "updateError",
-        message: "Please provide valid details to update.!!",
-      };
-    }
+  //   if (!checkForm) {
+  //     return {
+  //       status: "updateError",
+  //       message: "Please provide valid details to update.!!",
+  //     };
+  //   }
 
-    if (
-      !checkForm.active_step ||
-      checkForm.active_step < CONSTANT.stepsFeature().PRODUCER
-    ) {
-      data.active_step = CONSTANT.stepsFeature().PRODUCER;
-    }
-    update = await checkForm.update(data);
-    return {
-      status: "success",
-      message: "Records updated successfully.!!",
-      data: update,
-    };
-  },
+  //   if (
+  //     !checkForm.active_step ||
+  //     checkForm.active_step < CONSTANT.stepsFeature().PRODUCER
+  //   ) {
+  //     data.active_step = CONSTANT.stepsFeature().PRODUCER;
+  //   }
+  //   update = await checkForm.update(data);
+  //   return {
+  //     status: "success",
+  //     message: "Records updated successfully.!!",
+  //     data: update,
+  //   };
+  // },
 
-  handleSongsStep: async (data, payload, user) => {
-    const lastId = payload.last_id;
+  // handleSongsStep: async (data, payload, user) => {
+  //   const lastId = payload.last_id;
 
-    const checkForm = await NfaFeature.findOne({
-      where: { client_id: payload.user.id, id: lastId },
-    });
+  //   const checkForm = await NfaFeature.findOne({
+  //     where: { client_id: payload.user.id, id: lastId },
+  //   });
 
-    if (!checkForm) {
-      return {
-        status: "updateError",
-        message: "Please provide valid details to update.!!",
-      };
-    }
+  //   if (!checkForm) {
+  //     return {
+  //       status: "updateError",
+  //       message: "Please provide valid details to update.!!",
+  //     };
+  //   }
 
-    if (
-      !checkForm.active_step ||
-      checkForm.active_step < CONSTANT.stepsFeature().PRODUCER
-    ) {
-      data.active_step = CONSTANT.stepsFeature().PRODUCER;
-    }
-    update = await checkForm.update(data);
-    return {
-      status: "success",
-      message: "Records updated successfully.!!",
-      data: update,
-    };
-  },
+  //   if (
+  //     !checkForm.active_step ||
+  //     checkForm.active_step < CONSTANT.stepsFeature().PRODUCER
+  //   ) {
+  //     data.active_step = CONSTANT.stepsFeature().PRODUCER;
+  //   }
+  //   update = await checkForm.update(data);
+  //   return {
+  //     status: "success",
+  //     message: "Records updated successfully.!!",
+  //     data: update,
+  //   };
+  // },
 
-  handleAudiographerStep: async (data, payload, user) => {
-    const lastId = payload.last_id;
+  // handleAudiographerStep: async (data, payload, user) => {
+  //   const lastId = payload.last_id;
 
-    const checkForm = await NfaFeature.findOne({
-      where: { client_id: payload.user.id, id: lastId },
-    });
+  //   const checkForm = await NfaFeature.findOne({
+  //     where: { client_id: payload.user.id, id: lastId },
+  //   });
 
-    if (!checkForm) {
-      return {
-        status: "updateError",
-        message: "Please provide valid details to update.!!",
-      };
-    }
+  //   if (!checkForm) {
+  //     return {
+  //       status: "updateError",
+  //       message: "Please provide valid details to update.!!",
+  //     };
+  //   }
 
-    if (
-      !checkForm.active_step ||
-      checkForm.active_step < CONSTANT.stepsFeature().PRODUCER
-    ) {
-      data.active_step = CONSTANT.stepsFeature().PRODUCER;
-    }
-    update = await checkForm.update(data);
-    return {
-      status: "success",
-      message: "Records updated successfully.!!",
-      data: update,
-    };
-  },
+  //   if (
+  //     !checkForm.active_step ||
+  //     checkForm.active_step < CONSTANT.stepsFeature().PRODUCER
+  //   ) {
+  //     data.active_step = CONSTANT.stepsFeature().PRODUCER;
+  //   }
+  //   update = await checkForm.update(data);
+  //   return {
+  //     status: "success",
+  //     message: "Records updated successfully.!!",
+  //     data: update,
+  //   };
+  // },
 
   handleOtherStep: async (data, payload, user) => {
     const lastId = payload.last_id;
 
-    const checkForm = await NfaFeature.findOne({
+    const checkForm = await NfaNonFeature.findOne({
       where: { client_id: payload.user.id, id: lastId },
     });
 
@@ -406,9 +410,9 @@ const nfaNonFeatureController = {
 
     if (
       !checkForm.active_step ||
-      checkForm.active_step < CONSTANT.stepsFeature().OTHER
+      checkForm.active_step < CONSTANT.stepsNonFeature().OTHER
     ) {
-      data.active_step = CONSTANT.stepsFeature().OTHER;
+      data.active_step = CONSTANT.stepsNonFeature().OTHER;
     }
 
     if (payload.files && Array.isArray(payload.files)) {
@@ -448,7 +452,7 @@ const nfaNonFeatureController = {
   handleReturnAddressStep: async (data, payload, user) => {
     const lastId = payload.last_id;
 
-    const checkForm = await NfaFeature.findOne({
+    const checkForm = await NfaNonFeature.findOne({
       where: { client_id: payload.user.id, id: lastId },
     });
 
@@ -461,9 +465,9 @@ const nfaNonFeatureController = {
 
     if (
       !checkForm.active_step ||
-      checkForm.active_step < CONSTANT.stepsFeature().RETURN_ADDRESS
+      checkForm.active_step < CONSTANT.stepsNonFeature().RETURN_ADDRESS
     ) {
-      data.active_step = CONSTANT.stepsFeature().RETURN_ADDRESS;
+      data.active_step = CONSTANT.stepsNonFeature().RETURN_ADDRESS;
     }
 
     update = await checkForm.update(data);
@@ -477,7 +481,7 @@ const nfaNonFeatureController = {
   handleDeclarationStep: async (data, payload, user) => {
     const lastId = payload.last_id;
 
-    const checkForm = await NfaFeature.findOne({
+    const checkForm = await NfaNonFeature.findOne({
       where: { client_id: payload.user.id, id: lastId },
     });
 
@@ -490,9 +494,9 @@ const nfaNonFeatureController = {
 
     if (
       !checkForm.active_step ||
-      checkForm.active_step < CONSTANT.stepsFeature().DECLARATION
+      checkForm.active_step < CONSTANT.stepsNonFeature().DECLARATION
     ) {
-      data.active_step = CONSTANT.stepsFeature().DECLARATION;
+      data.active_step = CONSTANT.stepsNonFeature().DECLARATION;
     }
 
     update = await checkForm.update(data);
@@ -515,20 +519,20 @@ const nfaNonFeatureController = {
         user: req.user,
       };
 
-      const nfaFeature = await NfaFeature.findOne({
+      const nfaNonFeature = await NfaNonFeature.findOne({
         where: {
           id: payload.last_id,
           client_id: payload.user.id,
         },
       });
 
-      if (!nfaFeature) {
+      if (!nfaNonFeature) {
         return responseHelper(res, "exception", {
           message: "You do not have any entries.!!",
         });
       }
 
-      if (nfaFeature.payment_status !== 2) {
+      if (nfaNonFeature.payment_status !== 2) {
         return responseHelper(res, "exception", {
           message: "Your payment is not completed.!!",
         });
@@ -545,7 +549,7 @@ const nfaNonFeatureController = {
 
       return responseHelper(res, "success", {
         message: "You have successfully submitted your form.!!",
-        data: nfaFeature,
+        data: nfaNonFeature,
       });
     } catch (error) {
       return responseHelper(res, "exception", { message: error.message });
