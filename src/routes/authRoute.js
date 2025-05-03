@@ -45,7 +45,7 @@ router.post("/non-feature-final-submit", NfaNonFeatureController.finalSubmit);
 
 //**************************PRODUCER**********************************
 router.post("/store-producer", ProducerController.storeProducer);
-// router.post("/update-producer", ProducerController.updateProducer);
+router.post("/update-producer", ProducerController.updateProducer);
 // router.get("/list-producer", ProducerController.listProducer);
 // router.get("/get-producer-by/:id", ProducerController.getProducer);
 // router.get("/delete-producer/:id", ProducerController.deleteProducer);
