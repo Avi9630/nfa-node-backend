@@ -1,6 +1,7 @@
 const NfaNonFeatureController = require("../controllers/nfaNonFeatureController");
 const NfaFeatureController = require("../controllers/nfaFeatureController");
 const ProducerController = require("../controllers/producerController");
+const DirectorController = require("../controllers/directorController");
 const ClientController = require("../controllers/clientController");
 const express = require("express");
 const router = express.Router();
@@ -46,15 +47,15 @@ router.post("/non-feature-final-submit", NfaNonFeatureController.finalSubmit);
 //**************************PRODUCER**********************************
 router.post("/store-producer", ProducerController.storeProducer);
 router.post("/update-producer", ProducerController.updateProducer);
-// router.get("/list-producer", ProducerController.listProducer);
-// router.get("/get-producer-by/:id", ProducerController.getProducer);
-// router.get("/delete-producer/:id", ProducerController.deleteProducer);
+router.post("/list-producer", ProducerController.listProducer);
+router.get("/get-producer-by/:id", ProducerController.getProducer);
+router.get("/delete-producer/:id", ProducerController.deleteProducer);
 
 //**************************DIRECTOR**********************************
-// router.get("/store-director", directorController.storeDirector);
-// router.get("/update-director", directorController.updateDirector);
-// router.get("/list-director", directorController.listDirector);
-// router.get("/get-director-by/:id", directorController.getDirector);
-// router.get("/delete-director/:id", directorController.deleteDirector);
+router.post("/store-director", DirectorController.storeDirector);
+router.post("/update-director", DirectorController.updateDirector);
+router.post("/list-director", DirectorController.listDirector);
+router.get("/get-director-by/:id", DirectorController.getDirector);
+router.get("/delete-director/:id", DirectorController.deleteDirector);
 
 module.exports = router;

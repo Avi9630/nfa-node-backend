@@ -20,9 +20,9 @@ const upload = multer();
 
 // Testing
 app.post("/submit", upload.any(), (req, res) => {
-    payload = req.body;
-    responseHelper(res, "success", { data: payload, file: req.file });
-    // res.send("Form received!" + payload);
+  payload = req.body;
+  responseHelper(res, "success", { data: payload, file: req.file });
+  // res.send("Form received!" + payload);
 });
 
 // Routes

@@ -1,7 +1,7 @@
 const { string } = require("joi");
 var validator = require("validator");
 
-const ProducerSchema = {
+const DirectorSchema = {
   validateStore: (data, files) => {
     const errors = {};
 
@@ -24,12 +24,12 @@ const ProducerSchema = {
     }
 
     if (
-      trimmedData.receive_producer_award !== undefined &&
-      trimmedData.receive_producer_award !== null &&
-      !["1", 1].includes(trimmedData.receive_producer_award)
+      trimmedData.receive_director_award !== undefined &&
+      trimmedData.receive_director_award !== null &&
+      !["1", 1].includes(trimmedData.receive_director_award)
     ) {
-      errors.receive_producer_award =
-        "Receive producer award must be Yes(1) if provided.";
+      errors.receive_director_award =
+        "Receive director award must be Yes(1) if provided.";
     }
 
     if (trimmedData.indian_national === "0") {
@@ -65,15 +65,15 @@ const ProducerSchema = {
       errors.address = "Address is required!";
     }
 
-    const producerDoc = files?.find(
-      (file) => file.fieldname === "producer_self_attested_doc"
+    const directorDoc = files?.find(
+      (file) => file.fieldname === "director_self_attested_doc"
     );
 
-    if (!producerDoc) {
-      errors.producer_self_attested_doc =
+    if (!directorDoc) {
+      errors.director_self_attested_doc =
         "Producer self-attested document is required!";
-    } else if (!producerDoc.mimetype.startsWith("application/")) {
-      errors.producer_self_attested_doc =
+    } else if (!directorDoc.mimetype.startsWith("application/")) {
+      errors.director_self_attested_doc =
         "Invalid file format for producer self-attested document!";
     }
 
@@ -92,6 +92,7 @@ const ProducerSchema = {
     }, {});
 
     if (!trimmedData.id || isNaN(String(trimmedData.id))) {
+      console.log(typeof trimmedData.id);
       errors.id = "ID is required and must be a number.!!";
     }
 
@@ -111,6 +112,14 @@ const ProducerSchema = {
         "Either a valid NFA feature ID or NFA non-feature ID is required!";
     }
 
+    if (
+      trimmedData.indian_national !== undefined &&
+      trimmedData.indian_national !== null &&
+      !["0", "1", 0, 1].includes(trimmedData.indian_national)
+    ) {
+      errors.indian_national = "Indian national must be 0 OR 1.!!";
+    }
+
     if (trimmedData.indian_national === "0") {
       if (!trimmedData.country_of_nationality) {
         errors.country_of_nationality = "Country of nationality is required!";
@@ -118,20 +127,12 @@ const ProducerSchema = {
     }
 
     if (
-      trimmedData.receive_producer_award !== undefined &&
-      trimmedData.receive_producer_award !== null &&
-      !["1", 1].includes(trimmedData.receive_producer_award)
+      trimmedData.receive_director_award !== undefined &&
+      trimmedData.receive_director_award !== null &&
+      !["1", 1].includes(trimmedData.receive_director_award)
     ) {
-      errors.receive_producer_award =
-        "Receive producer award must be Yes(1) if provided.";
-    }
-
-    if (
-      trimmedData.indian_national !== undefined &&
-      trimmedData.indian_national !== null &&
-      !["0", "1", 0, 1].includes(trimmedData.indian_national)
-    ) {
-      errors.indian_national = "Indian national must be 0 OR 1.!!";
+      errors.receive_director_award =
+        "Receive director award must be Yes(1) if provided.";
     }
 
     if (
@@ -150,10 +151,6 @@ const ProducerSchema = {
       errors.contact_nom = "Mobile must be a valid 10-digit Indian number";
     }
 
-    // if (!validator.matches(trimmedData.pincode, /^\d{6}$/)) {
-    //   errors.pincode = "Pincode must be 6 digits";
-    // }
-
     if (
       trimmedData.pincode &&
       typeof trimmedData.pincode === "string" &&
@@ -162,13 +159,13 @@ const ProducerSchema = {
       errors.pincode = "Pincode must be a valid 6-digit number";
     }
 
-    const producerDoc = files?.find(
-      (file) => file.fieldname === "producer_self_attested_doc"
+    const directorDoc = files?.find(
+      (file) => file.fieldname === "director_self_attested_doc"
     );
 
-    if (producerDoc) {
-      if (!producerDoc.mimetype.startsWith("application/")) {
-        errors.producer_self_attested_doc =
+    if (directorDoc) {
+      if (!directorDoc.mimetype.startsWith("application/")) {
+        errors.director_self_attested_doc =
           "Invalid file format! Only document files are allowed.";
       }
     }
@@ -179,7 +176,7 @@ const ProducerSchema = {
     };
   },
 
-  validateListProducer: (data) => {
+  validateListDirector: (data) => {
     const errors = {};
 
     const trimmedData = Object.keys(data).reduce((acc, key) => {
@@ -209,4 +206,4 @@ const ProducerSchema = {
     };
   },
 };
-module.exports = ProducerSchema;
+module.exports = DirectorSchema;

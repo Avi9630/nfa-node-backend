@@ -1,18 +1,20 @@
 const { NfaNonFeature } = require("../models/NfaNonFeature");
 const ProducerSchema = require("../helpers/producerSchema");
 const responseHelper = require("../helpers/responseHelper");
+const DirectorSchema = require("../helpers/directorSchema");
 const { NfaFeature } = require("../models/NfaFeature");
-const { Producer } = require("../models/Producer");
+const { Director } = require("../models/Director");
 const ImageLib = require("../libraries/ImageLib");
 
-const ProducerController = {
-  storeProducer: async (req, res) => {
+const DirectorController = {
+  storeDirector: async (req, res) => {
     const files = req.files;
-    const { isValid, errors } = ProducerSchema.validateStore(req.body, files);
+    const { isValid, errors } = DirectorSchema.validateStore(req.body, files);
 
     if (!isValid) {
       return responseHelper(res, "validatorerrors", { errors });
     }
+
     try {
       const payload = {
         ...req.body,
@@ -41,8 +43,8 @@ const ProducerController = {
         }
       }
 
-      const censorFile = payload.files.find(
-        (file) => file.fieldname === "producer_self_attested_doc"
+      const directorFile = payload.files.find(
+        (file) => file.fieldname === "director_self_attested_doc"
       );
 
       arrayToInsert = {
@@ -51,21 +53,21 @@ const ProducerController = {
         nfa_non_feature_id: payload.nfa_non_feature_id ?? null,
         indian_national: payload.indian_national,
         name: payload.name,
-        receive_producer_award: payload.receive_producer_award ?? null,
+        receive_director_award: payload.receive_director_award ?? null,
         contact_nom: payload.contact_nom,
         email: payload.email,
         address: payload.address,
         pincode: payload.pincode,
-        producer_self_attested_doc: censorFile.originalname,
+        director_self_attested_doc: directorFile.originalname,
         country_of_nationality: payload.country_of_nationality ?? null,
         production_company: payload.production_company ?? null,
       };
 
-      producer = await Producer.create(arrayToInsert);
+      director = await Director.create(arrayToInsert);
 
-      if (!producer) {
+      if (!director) {
         return responseHelper(res, "noresult", {
-          message: "Producer not created.!!",
+          message: "Director not created.!!",
         });
       }
 
@@ -82,37 +84,37 @@ const ProducerController = {
       }
 
       if (payload.files && Array.isArray(payload.files)) {
-        const producerDoc = payload.files.find(
-          (file) => file.fieldname === "producer_self_attested_doc"
+        const directorDoc = payload.files.find(
+          (file) => file.fieldname === "director_self_attested_doc"
         );
 
-        if (producerDoc) {
+        if (directorDoc) {
           const fileUpload = await ImageLib.imageUpload({
-            id: producer.id,
-            image_key: "producer_self_attested_doc",
+            id: director.id,
+            image_key: "director_self_attested_doc",
             websiteType: "NFA",
             formType: formType,
-            image: producerDoc,
+            image: directorDoc,
           });
 
           if (!fileUpload.status) {
             return responseHelper(res, "exception", {
-              message: "Producer Doc not uploaded.!!",
+              message: "Director Doc not uploaded.!!",
             });
           }
         }
       }
       return responseHelper(res, "created", {
-        message: "Producer created successfully.!!",
+        message: "Director created successfully.!!",
       });
     } catch (error) {
       return responseHelper(res, "exception", { message: error.message });
     }
   },
 
-  updateProducer: async (req, res) => {
+  updateDirector: async (req, res) => {
     const files = req.files;
-    const { isValid, errors } = ProducerSchema.validateUpdate(req.body, files);
+    const { isValid, errors } = DirectorSchema.validateUpdate(req.body, files);
 
     if (!isValid) {
       return responseHelper(res, "validatorerrors", { errors });
@@ -125,17 +127,17 @@ const ProducerController = {
         files: req.files,
       };
 
-      const producer = await Producer.findOne({
+      const director = await Director.findOne({
         where: { id: payload.id, client_id: payload.user.id },
       });
 
-      if (!producer) {
-        return responseHelper(res, "noresults");
+      if (!director) {
+        return responseHelper(res, "noresult");
       }
 
       if (
-        producer.nfa_feature_id !== null &&
-        payload.nfa_feature_id !== String(producer.nfa_feature_id)
+        director.nfa_feature_id !== null &&
+        payload.nfa_feature_id !== String(director.nfa_feature_id)
       ) {
         return responseHelper(res, "updateError", {
           message: "You cannot modify feature ID!",
@@ -143,8 +145,8 @@ const ProducerController = {
       }
 
       if (
-        producer.nfa_non_feature_id !== null &&
-        payload.nfa_non_feature_id !== String(producer.nfa_non_feature_id)
+        director.nfa_non_feature_id !== null &&
+        payload.nfa_non_feature_id !== String(director.nfa_non_feature_id)
       ) {
         return responseHelper(res, "updateError", {
           message: "You cannot modify feature ID!",
@@ -158,38 +160,38 @@ const ProducerController = {
         : "";
 
       const updatedData = {
-        nfa_feature_id: payload.nfa_feature_id ?? producer.nfa_feature_id,
+        nfa_feature_id: payload.nfa_feature_id ?? director.nfa_feature_id,
         nfa_non_feature_id:
-          payload.nfa_non_feature_id ?? producer.nfa_non_feature_id,
-        indian_national: payload.indian_national ?? producer.indian_national,
-        name: payload.name ?? producer.name,
-        receive_producer_award:
-          payload.receive_producer_award ?? producer.receive_producer_award,
-        contact_nom: payload.contact_nom ?? producer.contact_nom,
-        email: payload.email ?? producer.email,
-        address: payload.address ?? producer.address,
-        pincode: payload.pincode ?? producer.pincode,
+          payload.nfa_non_feature_id ?? director.nfa_non_feature_id,
+        indian_national: payload.indian_national ?? director.indian_national,
+        name: payload.name ?? director.name,
+        receive_director_award:
+          payload.receive_director_award ?? director.receive_director_award,
+        contact_nom: payload.contact_nom ?? director.contact_nom,
+        email: payload.email ?? director.email,
+        address: payload.address ?? director.address,
+        pincode: payload.pincode ?? director.pincode,
         country_of_nationality:
-          payload.country_of_nationality ?? producer.country_of_nationality,
-        producer_self_attested_doc:
-          payload.producer_self_attested_doc ??
-          producer.producer_self_attested_doc,
+          payload.country_of_nationality ?? director.country_of_nationality,
+        director_self_attested_doc:
+          payload.director_self_attested_doc ??
+          director.director_self_attested_doc,
         production_company:
-          payload.production_company ?? producer.production_company,
+          payload.production_company ?? director.production_company,
       };
 
       if (Array.isArray(payload.files)) {
-        const producerFile = payload.files.find(
-          (file) => file.fieldname === "producer_self_attested_doc"
+        const directorFile = payload.files.find(
+          (file) => file.fieldname === "director_self_attested_doc"
         );
 
-        if (producerFile) {
+        if (directorFile) {
           const fileUpload = await ImageLib.imageUpload({
             id: payload.id,
-            image_key: "producer_self_attested_doc",
+            image_key: "director_self_attested_doc",
             websiteType: "NFA",
             formType,
-            image: producerFile,
+            image: directorFile,
           });
 
           if (!fileUpload.status) {
@@ -198,12 +200,12 @@ const ProducerController = {
             });
           }
 
-          updatedData.producer_self_attested_doc = producerFile.originalname;
-          await producer.update(updatedData);
-          return responseHelper(res, "success", { data: producer });
+          updatedData.director_self_attested_doc = directorFile.originalname;
+          await director.update(updatedData);
+          return responseHelper(res, "success", { data: director });
         } else {
-          await producer.update(updatedData);
-          return responseHelper(res, "success", { data: producer });
+          await director.update(updatedData);
+          return responseHelper(res, "success", { data: director });
         }
       }
       responseHelper(res, "exception", { message: error.message });
@@ -212,8 +214,8 @@ const ProducerController = {
     }
   },
 
-  listProducer: async (req, res) => {
-    const { isValid, errors } = ProducerSchema.validateListProducer(req.body);
+  listDirector: async (req, res) => {
+    const { isValid, errors } = DirectorSchema.validateListDirector(req.body);
     if (!isValid) {
       return responseHelper(res, "validatorerrors", { errors });
     }
@@ -224,7 +226,7 @@ const ProducerController = {
         user: req.user,
       };
 
-      let allProducer;
+      let allDirector;
 
       if (payload.nfa_feature_id != null) {
         const checkFeature = await NfaFeature.findOne({
@@ -235,7 +237,7 @@ const ProducerController = {
             message: "Please provide valid details.!!",
           });
         }
-        allProducer = await Producer.findAll({
+        allDirector = await Director.findAll({
           where: {
             nfa_feature_id: payload.nfa_feature_id,
             client_id: payload.user.id,
@@ -252,49 +254,49 @@ const ProducerController = {
             message: "Please provide valid details.!!",
           });
         }
-        allProducer = await Producer.findAll({
+        allDirector = await Director.findAll({
           where: {
             nfa_non_feature_id: payload.nfa_non_feature_id,
             client_id: payload.user.id,
           },
         });
       }
-      responseHelper(res, "success", { data: allProducer });
+      responseHelper(res, "success", { data: allDirector });
     } catch (error) {
       responseHelper(res, "exception", { message: error });
     }
   },
 
-  getProducer: async (req, res) => {
+  getDirector: async (req, res) => {
     try {
       const payload = {
         ...req.params,
         user: req.user,
       };
-      const producer = await Producer.findOne({
+      const director = await Director.findOne({
         where: { id: payload.id, client_id: payload.user.id },
       });
-      if (producer) {
-        responseHelper(res, "success", { data: producer });
+      if (director) {
+        responseHelper(res, "success", { data: director });
       } else {
-        responseHelper(res, "noresult", { data: producer });
+        responseHelper(res, "noresult", { data: director });
       }
     } catch (error) {
       responseHelper(res, "exception", { message: error.message });
     }
   },
 
-  deleteProducer: async (req, res) => {
+  deleteDirector: async (req, res) => {
     try {
       const payload = {
         ...req.params,
         user: req.user,
       };
-      const producer = await Producer.findOne({
+      const director = await Director.findOne({
         where: { id: payload.id, client_id: payload.user.id },
       });
-      if (producer) {
-        await producer.destroy();
+      if (director) {
+        await director.destroy();
         responseHelper(res, "success");
       } else {
         responseHelper(res, "noresult");
@@ -304,4 +306,4 @@ const ProducerController = {
     }
   },
 };
-module.exports = ProducerController;
+module.exports = DirectorController;
