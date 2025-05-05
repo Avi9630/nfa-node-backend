@@ -3,6 +3,7 @@ const NfaFeatureController = require("../controllers/nfaFeatureController");
 const ProducerController = require("../controllers/producerController");
 const DirectorController = require("../controllers/directorController");
 const ClientController = require("../controllers/clientController");
+const ActorController = require("../controllers/actorController");
 const express = require("express");
 const router = express.Router();
 
@@ -57,5 +58,13 @@ router.post("/update-director", DirectorController.updateDirector);
 router.post("/list-director", DirectorController.listDirector);
 router.get("/get-director-by/:id", DirectorController.getDirector);
 router.get("/delete-director/:id", DirectorController.deleteDirector);
+
+//ACTOR
+router.post("/store-actor", ActorController.storeActor);
+router.post("/update-actor", ActorController.updateActor);
+router.get("/list-actor/:feature_id", ActorController.listActor);
+router.get("/get-actor-by/:id", ActorController.getActor);
+router.get("/delete-actor/:id", ActorController.deleteActor);
+// router.get("/list-actor-category", ActorController.allActorCategory);
 
 module.exports = router;
