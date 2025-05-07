@@ -244,6 +244,13 @@ const NfaFeature = sequelize.define(
   }
 );
 
+NfaFeature.associate = function (models) {
+  NfaFeature.hasMany(models.Document, {
+    foreignKey: "nfa_feature_id",
+    as: "documents",
+  });
+};
+
 const validateData = async (payload) => {
   const messages = {};
 

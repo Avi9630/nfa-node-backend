@@ -1,9 +1,20 @@
 const responseHelper = require("../helpers/responseHelper");
 const { NfaFeature } = require("../models/NfaFeature");
 const { Client } = require("../models/Client");
+const { Document } = require("../models/Document");
 const ImageLib = require("../libraries/ImageLib");
 const CONSTANT = require("../libraries/Constant");
 const NfaFeatureHelper = require("../helpers/nfaFeatureHelper");
+
+const {
+  // NfaFeature,
+  Producer,
+  Director,
+  Song,
+  Actor,
+  Audiographer,
+} = require("../models");
+
 // const Mail = require("../mailer/Mail");
 
 const nfaFeatureController = {
@@ -549,6 +560,70 @@ const nfaFeatureController = {
       });
     } catch (error) {
       return responseHelper(res, "exception", { message: error.message });
+    }
+  },
+
+  featureById: async (req, res) => {
+    const payload = {
+      ...req.params,
+      user: req.user,
+    };
+
+    try {
+      const nfaFeature = await NfaFeature.findOne({
+        where: { id: payload.id, client_id: payload.user.id },
+        include: [
+          {
+            model: Document,
+            as: "documents",
+          },
+        ],
+      });
+
+      console.log(nfaFeature);
+      return "From Controller";
+
+      if (!nfaFeature) {
+        return res.status(404).json({
+          status: "exception",
+          message: "Something went wrong!!",
+        });
+      }
+
+      const [producers, directors, songs, actors, audiographer] =
+        await Promise.all([
+          Producer.findAll({
+            where: { nfa_feature_id: nfaFeature.id },
+            include: ["documents"],
+          }),
+          Director.findAll({
+            where: { nfa_feature_id: nfaFeature.id },
+            include: ["documents"],
+          }),
+          Song.findAll({ where: { nfa_feature_id: nfaFeature.id } }),
+          Actor.findAll({ where: { nfa_feature_id: nfaFeature.id } }),
+          Audiographer.findAll({ where: { nfa_feature_id: nfaFeature.id } }),
+        ]);
+
+      const data = {
+        ...nfaFeature.toJSON(),
+        producers,
+        directors,
+        songs,
+        actors,
+        audiographer,
+      };
+
+      return res.status(200).json({
+        status: "success",
+        message: "Success.!!",
+        data,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "exception",
+        message: error.message,
+      });
     }
   },
 };

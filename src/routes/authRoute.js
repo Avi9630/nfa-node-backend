@@ -1,9 +1,11 @@
 const NfaNonFeatureController = require("../controllers/nfaNonFeatureController");
+const AudiographerController = require("../controllers/audiographerController");
 const NfaFeatureController = require("../controllers/nfaFeatureController");
 const ProducerController = require("../controllers/producerController");
 const DirectorController = require("../controllers/directorController");
 const ClientController = require("../controllers/clientController");
 const ActorController = require("../controllers/actorController");
+const SongController = require("../controllers/songController");
 const express = require("express");
 const router = express.Router();
 
@@ -11,12 +13,12 @@ const router = express.Router();
 router.get("/get-client-details", ClientController.getClientDetails);
 router.get("/delete-entry/:id", ClientController.entryDelete);
 router.get("/entry-list", ClientController.entryList);
-// router.post("/logout", ClientController.logout);
+router.post("/logout", ClientController.logout);
 
 // FEATURE
 router.post("/feature-entry", NfaFeatureController.Entry);
 router.post("/feature-final-submit", NfaFeatureController.finalSubmit);
-// router.get("/feature-entry-by/:id", NfaFeatureController.featureById);
+router.get("/feature-entry-by/:id", NfaFeatureController.featureById);
 
 //***********************NON-FEATURE********************************
 router.post("/non-feature-entry", NfaNonFeatureController.Entry);
@@ -65,6 +67,26 @@ router.post("/update-actor", ActorController.updateActor);
 router.get("/list-actor/:feature_id", ActorController.listActor);
 router.get("/get-actor-by/:id", ActorController.getActor);
 router.get("/delete-actor/:id", ActorController.deleteActor);
-// router.get("/list-actor-category", ActorController.allActorCategory);
+router.get("/list-actor-category", ActorController.allActorCategory);
+
+//SONGS
+router.post("/store-song", SongController.storeSong);
+router.post("/update-song", SongController.updateSong);
+router.get("/list-song/:feature_id", SongController.listSong);
+router.get("/get-song-by/:id", SongController.getSong);
+router.get("/delete-song/:id", SongController.deleteSong);
+
+//AUDIOGRAPHER
+router.post("/store-audiographer", AudiographerController.storeAudiographer);
+router.post("/update-audiographer", AudiographerController.updateAudiographer);
+router.get(
+  "/list-audiographer/:feature_id",
+  AudiographerController.listAudiographer
+);
+router.get("/get-audiographer-by/:id", AudiographerController.getAudiographer);
+router.get(
+  "/delete-audiographer/:id",
+  AudiographerController.deleteAudiographer
+);
 
 module.exports = router;

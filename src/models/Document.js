@@ -1,8 +1,5 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require(".");
-const bcrypt = require("bcryptjs");
-const jwt = require("jsonwebtoken");
-const { date } = require("joi");
 
 const Document = sequelize.define(
   "Document",
@@ -54,6 +51,13 @@ const Document = sequelize.define(
     tableName: "documents",
   }
 );
+
+Document.associate = (models) => {
+  Document.belongsTo(models.NfaFeature, {
+    foreignKey: "nfa_feature_id",
+    as: "nfaFeature",
+  });
+};
 
 const documentType = () => {
   return {

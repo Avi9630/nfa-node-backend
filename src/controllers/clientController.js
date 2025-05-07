@@ -366,5 +366,15 @@ const ClientController = {
       responseHelper(res, "exception", { message: error.message });
     }
   },
+
+  logout: async (req, res) => {
+    try {
+      req.user.token = null;
+      await req.user.save();
+      responseHelper(res, "success", { message: "Logout successfully.!!" });
+    } catch (errors) {
+      responseHelper(res, "exception", { message: errors.message });
+    }
+  },
 };
 module.exports = ClientController;

@@ -1,12 +1,11 @@
 const responseHelper = require("../helpers/responseHelper");
+const SongSchema = require("../helpers/songSchema");
 const { NfaFeature } = require("../models/NfaFeature");
-const ActorSchema = require("../helpers/actorSchema");
-const Knex = require("../config/db");
-const { Actor } = require("../models/Actor");
+const { Song } = require("../models/Song");
 
-const ActorController = {
-  storeActor: async (req, res) => {
-    const { isValid, errors } = ActorSchema.validateStore(req.body);
+const SongController = {
+  storeSong: async (req, res) => {
+    const { isValid, errors } = SongSchema.validateStore(req.body);
 
     if (!isValid) {
       return responseHelper(res, "validatorerrors", { errors });
@@ -27,30 +26,32 @@ const ActorController = {
 
       arrayToInsert = {
         nfa_feature_id: payload.nfa_feature_id ?? null,
-        actor_category_id: payload.actor_category_id,
-        name: payload.name,
-        screen_name: payload.screen_name,
-        if_voice_dubbed: payload.if_voice_dubbed,
+        song_title: payload.song_title ?? null,
+        music_director: payload.music_director ?? null,
+        music_director_bkgd_music: payload.music_director_bkgd_music ?? null,
+        lyricist: payload.lyricist ?? null,
+        playback_singer_male: payload.playback_singer_male ?? null,
+        playback_singer_female: payload.playback_singer_female ?? null,
       };
 
-      actor = await Actor.create(arrayToInsert);
+      song = await Song.create(arrayToInsert);
 
-      if (!actor) {
+      if (!song) {
         return responseHelper(res, "noresult", {
-          message: "Actor not created.!!",
+          message: "Song not created.!!",
         });
       }
       return responseHelper(res, "created", {
-        message: "Producer created successfully.!!",
-        data: actor,
+        message: "Song created successfully.!!",
+        data: song,
       });
     } catch (error) {
       return responseHelper(res, "exception", { message: error.message });
     }
   },
 
-  updateActor: async (req, res) => {
-    const { isValid, errors } = ActorSchema.validateUpdate(req.body);
+  updateSong: async (req, res) => {
+    const { isValid, errors } = SongSchema.validateUpdate(req.body);
 
     if (!isValid) {
       return responseHelper(res, "validatorerrors", { errors });
@@ -62,9 +63,9 @@ const ActorController = {
         user: req.user,
       };
 
-      actor = await Actor.findOne({ where: { id: payload.id } });
+      song = await Song.findOne({ where: { id: payload.id } });
 
-      if (actor) {
+      if (song) {
         if (payload.nfa_feature_id !== undefined) {
           nfaFeature = await NfaFeature.findOne({
             where: { id: payload.nfa_feature_id, client_id: payload.user.id },
@@ -76,19 +77,23 @@ const ActorController = {
         }
 
         arrayToUpdate = {
-          nfa_feature_id: payload.nfa_feature_id ?? actor.nfa_feature_id,
-          actor_category_id:
-            payload.actor_category_id ?? actor.actor_category_id,
-          name: payload.name ?? actor.name,
-          screen_name: payload.screen_name ?? actor.screen_name,
-          if_voice_dubbed: payload.if_voice_dubbed ?? actor.if_voice_dubbed,
+          nfa_feature_id: payload.nfa_feature_id ?? song.nfa_feature_id,
+          song_title: payload.song_title ?? song.song_title,
+          music_director: payload.music_director ?? song.music_director,
+          music_director_bkgd_music:
+            payload.music_director_bkgd_music ?? song.music_director_bkgd_music,
+          lyricist: payload.lyricist ?? song.lyricist,
+          playback_singer_male:
+            payload.playback_singer_male ?? song.playback_singer_male,
+          playback_singer_female:
+            payload.playback_singer_female ?? song.playback_singer_female,
         };
 
-        actorUpdate = await actor.update(arrayToUpdate);
-        if (actorUpdate) {
+        songUpdate = await song.update(arrayToUpdate);
+        if (songUpdate) {
           return responseHelper(res, "success", {
-            message: "Actor updated successfully.!!",
-            data: actorUpdate,
+            message: "Song updated successfully.!!",
+            data: songUpdate,
           });
         } else {
           responseHelper(res, "updateError");
@@ -101,7 +106,7 @@ const ActorController = {
     }
   },
 
-  listActor: async (req, res) => {
+  listSong: async (req, res) => {
     try {
       const payload = {
         ...req.params,
@@ -113,13 +118,13 @@ const ActorController = {
       if (!nfaFeature) {
         responseHelper(res, "noresult");
       }
-      actorList = await Actor.findAll({
+      songList = await Song.findAll({
         where: { nfa_feature_id: payload.feature_id },
       });
-      if (actorList.length > 0) {
+      if (songList.length > 0) {
         responseHelper(res, "success", {
           message: "Here are your records.!!",
-          data: actorList,
+          data: songList,
         });
       } else {
         responseHelper(res, "noresult");
@@ -129,19 +134,19 @@ const ActorController = {
     }
   },
 
-  getActor: async (req, res) => {
+  getSong: async (req, res) => {
     try {
       const payload = {
         ...req.params,
         user: req.user,
       };
-      actorList = await Actor.findOne({
+      songList = await Song.findOne({
         where: { id: payload.id },
       });
-      if (actorList) {
+      if (songList) {
         responseHelper(res, "success", {
           message: "Here are your records.!!",
-          data: actorList,
+          data: songList,
         });
       } else {
         responseHelper(res, "noresult");
@@ -151,17 +156,17 @@ const ActorController = {
     }
   },
 
-  deleteActor: async (req, res) => {
+  deleteSong: async (req, res) => {
     try {
       const payload = {
         ...req.params,
         user: req.user,
       };
-      actor = await Actor.findOne({
+      song = await Song.findOne({
         where: { id: payload.id },
       });
-      if (actor) {
-        actor.destroy();
+      if (song) {
+        song.destroy();
         responseHelper(res, "success", {
           message: "Records deleted successfully.!!",
         });
@@ -172,23 +177,5 @@ const ActorController = {
       responseHelper(res, "exception", { message: errors.message });
     }
   },
-
-  allActorCategory: async (req, res) => {
-    try {
-      const actorCategory = await Knex("actor_category").select("id", "name");
-
-      if (actorCategory.length > 0) {
-        responseHelper(res, "success", {
-          message: "Actor category fetched successfully!",
-          data: actorCategory,
-        });
-      } else {
-        responseHelper(res, "notvalid");
-      }
-    } catch (errors) {
-      responseHelper(res, "exception", { message: errors.message });
-    }
-  },
 };
-
-module.exports = ActorController;
+module.exports = SongController;

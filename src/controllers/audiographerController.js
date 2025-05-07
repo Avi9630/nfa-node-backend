@@ -1,12 +1,11 @@
+const AudiographerSchema = require("../helpers/audiographerSchema");
 const responseHelper = require("../helpers/responseHelper");
+const { Audiographer } = require("../models/Audiographer");
 const { NfaFeature } = require("../models/NfaFeature");
-const ActorSchema = require("../helpers/actorSchema");
-const Knex = require("../config/db");
-const { Actor } = require("../models/Actor");
 
-const ActorController = {
-  storeActor: async (req, res) => {
-    const { isValid, errors } = ActorSchema.validateStore(req.body);
+const AudiographerController = {
+  storeAudiographer: async (req, res) => {
+    const { isValid, errors } = AudiographerSchema.validateStore(req.body);
 
     if (!isValid) {
       return responseHelper(res, "validatorerrors", { errors });
@@ -21,36 +20,36 @@ const ActorController = {
       nfaFeature = await NfaFeature.findOne({
         where: { id: payload.nfa_feature_id, client_id: payload.user.id },
       });
+
       if (!nfaFeature) {
         return responseHelper(res, "noresult");
       }
 
       arrayToInsert = {
         nfa_feature_id: payload.nfa_feature_id ?? null,
-        actor_category_id: payload.actor_category_id,
-        name: payload.name,
-        screen_name: payload.screen_name,
-        if_voice_dubbed: payload.if_voice_dubbed,
+        production_sound_recordist: payload.production_sound_recordist ?? null,
+        sound_designer: payload.sound_designer ?? null,
+        re_recordist_filnal: payload.re_recordist_filnal ?? null,
       };
 
-      actor = await Actor.create(arrayToInsert);
+      audiographer = await Audiographer.create(arrayToInsert);
 
-      if (!actor) {
+      if (!audiographer) {
         return responseHelper(res, "noresult", {
-          message: "Actor not created.!!",
+          message: "Audiographer not created.!!",
         });
       }
       return responseHelper(res, "created", {
-        message: "Producer created successfully.!!",
-        data: actor,
+        message: "Audiographer created successfully.!!",
+        data: audiographer,
       });
     } catch (error) {
       return responseHelper(res, "exception", { message: error.message });
     }
   },
 
-  updateActor: async (req, res) => {
-    const { isValid, errors } = ActorSchema.validateUpdate(req.body);
+  updateAudiographer: async (req, res) => {
+    const { isValid, errors } = AudiographerSchema.validateUpdate(req.body);
 
     if (!isValid) {
       return responseHelper(res, "validatorerrors", { errors });
@@ -62,9 +61,9 @@ const ActorController = {
         user: req.user,
       };
 
-      actor = await Actor.findOne({ where: { id: payload.id } });
+      audiographer = await Audiographer.findOne({ where: { id: payload.id } });
 
-      if (actor) {
+      if (audiographer) {
         if (payload.nfa_feature_id !== undefined) {
           nfaFeature = await NfaFeature.findOne({
             where: { id: payload.nfa_feature_id, client_id: payload.user.id },
@@ -76,19 +75,21 @@ const ActorController = {
         }
 
         arrayToUpdate = {
-          nfa_feature_id: payload.nfa_feature_id ?? actor.nfa_feature_id,
-          actor_category_id:
-            payload.actor_category_id ?? actor.actor_category_id,
-          name: payload.name ?? actor.name,
-          screen_name: payload.screen_name ?? actor.screen_name,
-          if_voice_dubbed: payload.if_voice_dubbed ?? actor.if_voice_dubbed,
+          nfa_feature_id: payload.nfa_feature_id ?? audiographer.nfa_feature_id,
+
+          production_sound_recordist:
+            payload.production_sound_recordist ??
+            audiographer.production_sound_recordist,
+          sound_designer: payload.sound_designer ?? audiographer.sound_designer,
+          re_recordist_filnal:
+            payload.re_recordist_filnal ?? audiographer.re_recordist_filnal,
         };
 
-        actorUpdate = await actor.update(arrayToUpdate);
-        if (actorUpdate) {
+        audiographerUpdate = await audiographer.update(arrayToUpdate);
+        if (audiographerUpdate) {
           return responseHelper(res, "success", {
-            message: "Actor updated successfully.!!",
-            data: actorUpdate,
+            message: "Audiographer updated successfully.!!",
+            data: audiographerUpdate,
           });
         } else {
           responseHelper(res, "updateError");
@@ -101,7 +102,7 @@ const ActorController = {
     }
   },
 
-  listActor: async (req, res) => {
+  listAudiographer: async (req, res) => {
     try {
       const payload = {
         ...req.params,
@@ -113,13 +114,13 @@ const ActorController = {
       if (!nfaFeature) {
         responseHelper(res, "noresult");
       }
-      actorList = await Actor.findAll({
+      audiographerList = await Audiographer.findAll({
         where: { nfa_feature_id: payload.feature_id },
       });
-      if (actorList.length > 0) {
+      if (audiographerList.length > 0) {
         responseHelper(res, "success", {
           message: "Here are your records.!!",
-          data: actorList,
+          data: audiographerList,
         });
       } else {
         responseHelper(res, "noresult");
@@ -129,19 +130,19 @@ const ActorController = {
     }
   },
 
-  getActor: async (req, res) => {
+  getAudiographer: async (req, res) => {
     try {
       const payload = {
         ...req.params,
         user: req.user,
       };
-      actorList = await Actor.findOne({
+      audiographerList = await Audiographer.findOne({
         where: { id: payload.id },
       });
-      if (actorList) {
+      if (audiographerList) {
         responseHelper(res, "success", {
           message: "Here are your records.!!",
-          data: actorList,
+          data: audiographerList,
         });
       } else {
         responseHelper(res, "noresult");
@@ -151,17 +152,17 @@ const ActorController = {
     }
   },
 
-  deleteActor: async (req, res) => {
+  deleteAudiographer: async (req, res) => {
     try {
       const payload = {
         ...req.params,
         user: req.user,
       };
-      actor = await Actor.findOne({
+      audiographer = await Audiographer.findOne({
         where: { id: payload.id },
       });
-      if (actor) {
-        actor.destroy();
+      if (audiographer) {
+        audiographer.destroy();
         responseHelper(res, "success", {
           message: "Records deleted successfully.!!",
         });
@@ -172,23 +173,5 @@ const ActorController = {
       responseHelper(res, "exception", { message: errors.message });
     }
   },
-
-  allActorCategory: async (req, res) => {
-    try {
-      const actorCategory = await Knex("actor_category").select("id", "name");
-
-      if (actorCategory.length > 0) {
-        responseHelper(res, "success", {
-          message: "Actor category fetched successfully!",
-          data: actorCategory,
-        });
-      } else {
-        responseHelper(res, "notvalid");
-      }
-    } catch (errors) {
-      responseHelper(res, "exception", { message: errors.message });
-    }
-  },
 };
-
-module.exports = ActorController;
+module.exports = AudiographerController;
