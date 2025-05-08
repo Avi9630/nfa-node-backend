@@ -1,6 +1,7 @@
 const NfaNonFeatureController = require("../controllers/nfaNonFeatureController");
 const AudiographerController = require("../controllers/audiographerController");
 const NfaFeatureController = require("../controllers/nfaFeatureController");
+const BestBookCinemaController = require("../controllers/bestBookCinemaController");
 const ProducerController = require("../controllers/producerController");
 const DirectorController = require("../controllers/directorController");
 const ClientController = require("../controllers/clientController");
@@ -18,7 +19,7 @@ router.post("/logout", ClientController.logout);
 // FEATURE
 router.post("/feature-entry", NfaFeatureController.Entry);
 router.post("/feature-final-submit", NfaFeatureController.finalSubmit);
-router.get("/feature-entry-by/:id", NfaFeatureController.featureById);
+// router.get("/feature-entry-by/:id", NfaFeatureController.featureById);
 
 //***********************NON-FEATURE********************************
 router.post("/non-feature-entry", NfaNonFeatureController.Entry);
@@ -26,7 +27,7 @@ router.post("/non-feature-final-submit", NfaNonFeatureController.finalSubmit);
 // router.get("/non-feature-entry-by/:id", NfaFeatureController.nonFeatureById);
 
 //*********************BEAST BOOK CINEMA ENTRY***********************
-// router.post("/best-book-cinema-entry", BestBookCinemaController.Entry);
+router.post("/best-book-cinema-entry", BestBookCinemaController.Entry);
 // router.post(
 //   "/best-book-cinema-final-submit",
 //   BestBookCinemaController.finalSubmit

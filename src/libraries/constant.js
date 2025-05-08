@@ -66,6 +66,26 @@ const Constant = {
       FINAL_SUBMIT: 9,
     };
   },
+
+  stepsBestBook: () => {
+    return {
+      BEST_BOOK_ON_CINEMA: 1,
+      AUTHOR: 2,
+      PUBLISHER_EDITOR: 3,
+      DECLARATION: 4,
+      FINAL_SUBMIT: 5,
+    };
+  },
+
+  stepsBestFilmCritic: () => {
+    return {
+      BEST_FILM_CRITIC: 1,
+      CRITIC: 2,
+      PUBLISHER: 3,
+      DECLARATION: 4,
+      FINAL_SUBMIT: 5,
+    };
+  },
 };
 
 module.exports = Constant;
