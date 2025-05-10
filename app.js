@@ -1,16 +1,15 @@
+const responseHelper = require("./src/helpers/responseHelper");
 const mySqlPool = require("./src/config/database");
 const apiRoutes = require("./src/routes/apiRoute");
 const authRoute = require("./src/routes/authRoute");
-const routes = require("./src/routes/route");
 const Auth = require("./src/middleware/auth");
+const routes = require("./src/routes/route");
 const express = require("express");
 const dotenv = require("dotenv");
-var cors = require("cors");
 const multer = require("multer");
-const responseHelper = require("./src/helpers/responseHelper");
-// const upload = require("multer")();
-dotenv.config();
+var cors = require("cors");
 const app = express();
+dotenv.config();
 
 // Middleware
 app.use(express.json());
@@ -18,12 +17,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 const upload = multer();
 
-// Testing
-app.post("/submit", upload.any(), (req, res) => {
-  payload = req.body;
-  responseHelper(res, "success", { data: payload, file: req.file });
-  // res.send("Form received!" + payload);
-});
+// app.post("/submit", upload.any(), (req, res) => {
+//   payload = req.body;
+//   responseHelper(res, "success", { data: payload, file: req.file });
+// });
 
 // Routes
 app.use("/", routes);

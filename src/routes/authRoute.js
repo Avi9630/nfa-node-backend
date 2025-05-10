@@ -1,48 +1,50 @@
+const BestBookCinemaController = require("../controllers/bestBookCinemaController");
+const BestFilmCriticController = require("../controllers/bestFilmCriticController");
 const NfaNonFeatureController = require("../controllers/nfaNonFeatureController");
 const AudiographerController = require("../controllers/audiographerController");
 const NfaFeatureController = require("../controllers/nfaFeatureController");
-const BestBookCinemaController = require("../controllers/bestBookCinemaController");
 const ProducerController = require("../controllers/producerController");
 const DirectorController = require("../controllers/directorController");
 const ClientController = require("../controllers/clientController");
 const ActorController = require("../controllers/actorController");
 const SongController = require("../controllers/songController");
+
 const express = require("express");
 const router = express.Router();
 
-//**************************8CLIENTS*******************************
+//**************************CLIENTS*******************************
 router.get("/get-client-details", ClientController.getClientDetails);
 router.get("/delete-entry/:id", ClientController.entryDelete);
 router.get("/entry-list", ClientController.entryList);
 router.post("/logout", ClientController.logout);
 
-// FEATURE
+//************************FEATURE********************//
 router.post("/feature-entry", NfaFeatureController.Entry);
 router.post("/feature-final-submit", NfaFeatureController.finalSubmit);
 // router.get("/feature-entry-by/:id", NfaFeatureController.featureById);
 
-//***********************NON-FEATURE********************************
+//************************NON-FEATURE********************************//
 router.post("/non-feature-entry", NfaNonFeatureController.Entry);
 router.post("/non-feature-final-submit", NfaNonFeatureController.finalSubmit);
 // router.get("/non-feature-entry-by/:id", NfaFeatureController.nonFeatureById);
 
-//*********************BEAST BOOK CINEMA ENTRY***********************
+//**********************BEAST BOOK CINEMA ENTRY***********************//
 router.post("/best-book-cinema-entry", BestBookCinemaController.Entry);
-// router.post(
-//   "/best-book-cinema-final-submit",
-//   BestBookCinemaController.finalSubmit
-// );
+router.post(
+  "/best-book-cinema-final-submit",
+  BestBookCinemaController.finalSubmit
+);
 // router.get(
 //   "/best-book-cinema-entry-by/:id",
 //   BestBookCinemaController.bestBookById
 // );
 
 //*********************BEST FILM CRITIC*******************************
-// router.post("/best-film-critic-entry", BestFilmCriticController.Entry);
-// router.post(
-//   "/best-film-critic-final-submit",
-//   BestFilmCriticController.finalSubmit
-// );
+router.post("/best-film-critic-entry", BestFilmCriticController.Entry);
+router.post(
+  "/best-film-critic-final-submit",
+  BestFilmCriticController.finalSubmit
+);
 // router.get(
 //   "/best-film-critic-entry-by/:id",
 //   BestFilmCriticController.bestFilmCriticById
@@ -90,4 +92,20 @@ router.get(
   AudiographerController.deleteAudiographer
 );
 
+//*****************************BOOKS******************************//
+router.post("/store-book", BookController.storeBook);
+router.post("/update-book", BookController.updateBook);
+router.post("/list-book", BookController.listBook);
+router.get("/get-book-by/:id", BookController.getBook);
+router.get("/delete-book/:id", BookController.deleteBook);
+
+// ****************************EDITORS********************************//
+// router.post("/store-editor", EditorController.storeEditor);
+// router.post("/update-editor", EditorController.updateEditor);
+// router.post("/list-editor", EditorController.listEditor);
+// router.get("/get-editor-by/:id", EditorController.getEditor);
+// router.get("/delete-editor/:id", EditorController.deleteEditor);
+
+//*****************************LANGUAGE*******************************//
+router.get("/get-all-languages", CommonController.deleteEditor);
 module.exports = router;

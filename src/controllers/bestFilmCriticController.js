@@ -1,14 +1,15 @@
-const responseHelper = require("../helpers/responseHelper");
-const BestBookCinemaHelper = require("../helpers/bestBookCinemaHelper");
+const BestFilmCriticHelper = require("../helpers/bestFilmCriticHelper");
 const { BestBookCinema } = require("../models/BestBookCinema");
+const responseHelper = require("../helpers/responseHelper");
 const CONSTANT = require("../libraries/Constant");
 const ImageLib = require("../libraries/ImageLib");
 const { Client } = require("../models/Client");
+const { BestFilmCritic } = require("../models/BestFilmCritic");
 
-const BestBookCinemaController = {
+const BestFilmCriticController = {
   Entry: async (req, res) => {
     const files = req.files;
-    const { isValid, errors } = BestBookCinemaHelper.validateStepInput(
+    const { isValid, errors } = BestFilmCriticHelper.validateStepInput(
       req.body,
       files
     );
@@ -24,8 +25,11 @@ const BestBookCinemaController = {
         files: req.files,
       };
 
-      const data = await BestBookCinema.consumeRecords(payload);
+      const data = await BestFilmCritic.consumeRecords(payload);
       data.step = payload.step;
+
+      // console.log(req.body);
+      // return "From Controller";
 
       const user = await Client.findOne({ where: { id: payload.user.id } });
       if (user.usertype !== 2) {
@@ -35,27 +39,28 @@ const BestBookCinemaController = {
       }
 
       const stepHandlers = {
-        [CONSTANT.stepsBestBook().BEST_BOOK_ON_CINEMA]: async (data, payload) =>
-          await BestBookCinemaController.handleBestBookOnCinemaStep(
+        [CONSTANT.stepsBestFilmCritic().BEST_FILM_CRITIC]: async (
+          data,
+          payload
+        ) =>
+          await BestFilmCriticController.handleBestFilmCriticStep(
             data,
             payload
           ),
 
-        [CONSTANT.stepsBestBook().AUTHOR]: async (data, payload) =>
-          await BestBookCinemaController.handleAuthorStep(data, payload),
+        [CONSTANT.stepsBestFilmCritic().CRITIC]: async (data, payload) =>
+          await BestFilmCriticController.handleCriticStep(data, payload),
 
-        [CONSTANT.stepsBestBook().PUBLISHER_EDITOR]: async (data, payload) =>
-          await BestBookCinemaController.handlePublisherEditorStep(
-            data,
-            payload
-          ),
+        [CONSTANT.stepsBestFilmCritic().PUBLISHER]: async (data, payload) =>
+          await BestFilmCriticController.handlePublisherStep(data, payload),
 
-        [CONSTANT.stepsBestBook().DECLARATION]: async (data, payload) =>
-          await BestBookCinemaController.handleDeclarationStep(data, payload),
+        [CONSTANT.stepsBestFilmCritic().DECLARATION]: async (data, payload) =>
+          await BestFilmCriticController.handleDeclarationStep(data, payload),
       };
 
       if (stepHandlers[data.step]) {
         const result = await stepHandlers[data.step](data, payload);
+
         if (result?.status === "created") {
           return responseHelper(res, "created", {
             message: result?.data?.message || "Created successfully.",
@@ -76,7 +81,10 @@ const BestBookCinemaController = {
             errors: result?.error || {},
           });
         }
-        return responseHelper(res, "success", { data: result });
+        return responseHelper(res, "success", {
+          message: result.message,
+          data: result.data,
+        });
       }
 
       responseHelper(res, "badrequest", {
@@ -88,7 +96,7 @@ const BestBookCinemaController = {
   },
 
   finalSubmit: async (req, res) => {
-    const { isValid, errors } = BestBookCinemaHelper.finalSubmitStep(req.body);
+    const { isValid, errors } = BestFilmCriticHelper.finalSubmitStep(req.body);
     if (!isValid) {
       return responseHelper(res, "validatorerrors", { errors });
     }
@@ -99,20 +107,20 @@ const BestBookCinemaController = {
         user: req.user,
       };
 
-      const bestBookCinema = await BestBookCinema.findOne({
+      const bestFilmCritic = await BestFilmCritic.findOne({
         where: {
           id: payload.last_id,
           client_id: payload.user.id,
         },
       });
 
-      if (!bestBookCinema) {
+      if (!bestFilmCritic) {
         return responseHelper(res, "exception", {
           message: "You do not have any entries.!!",
         });
       }
 
-      if (bestBookCinema.payment_status !== 2) {
+      if (bestFilmCritic.payment_status !== 2) {
         return responseHelper(res, "exception", {
           message: "Your payment is not completed.!!",
         });
@@ -136,11 +144,11 @@ const BestBookCinemaController = {
     }
   },
 
-  handleBestBookOnCinemaStep: async (data, payload) => {
+  handleBestFilmCriticStep: async (data, payload) => {
     const lastId = payload.last_id || null;
 
     if (lastId) {
-      const checkForm = await BestBookCinema.findOne({
+      const checkForm = await BestFilmCritic.findOne({
         where: { client_id: data.client_id, id: lastId },
       });
 
@@ -153,10 +161,11 @@ const BestBookCinemaController = {
 
       if (
         !checkForm.active_step ||
-        checkForm.active_step < CONSTANT.stepsBestBook().BEST_BOOK_ON_CINEMA
+        checkForm.active_step < CONSTANT.stepsBestFilmCritic().BEST_FILM_CRITIC
       ) {
-        data.active_step = CONSTANT.stepsBestBook().BEST_BOOK_ON_CINEMA;
+        data.active_step = CONSTANT.stepsBestFilmCritic().BEST_FILM_CRITIC;
       }
+
       update = await checkForm.update(data);
       return {
         status: "success",
@@ -166,18 +175,19 @@ const BestBookCinemaController = {
     }
 
     data.active_step = payload.step;
-    create = await BestBookCinema.createBestBook(data);
+    create = await BestFilmCritic.createFilmCritic(data);
+
     return {
       status: "created",
       data: { message: "Beast book created.!!", record: create },
     };
   },
 
-  handleAuthorStep: async (data, payload) => {
+  handleCriticStep: async (data, payload) => {
     const lastId = payload.last_id;
 
     if (lastId) {
-      const checkForm = await BestBookCinema.findOne({
+      const checkForm = await BestFilmCritic.findOne({
         where: { client_id: payload.user.id, id: lastId },
       });
 
@@ -190,36 +200,37 @@ const BestBookCinemaController = {
 
       if (
         !checkForm.active_step ||
-        checkForm.active_step < CONSTANT.stepsBestBook().AUTHOR
+        checkForm.active_step < CONSTANT.stepsBestFilmCritic().CRITIC
       ) {
-        data.active_step = CONSTANT.stepsBestBook().AUTHOR;
+        data.active_step = CONSTANT.stepsBestFilmCritic().CRITIC;
       }
 
       if (payload.files && Array.isArray(payload.files)) {
-        const authorAadhaar = payload.files.find(
-          (file) => file.fieldname === "author_aadhaar_card"
+        const criticAadhaar = payload.files.find(
+          (file) => file.fieldname === "critic_aadhaar_card"
         );
 
-        if (authorAadhaar) {
+        if (criticAadhaar) {
           const fileUpload = await ImageLib.imageUpload({
             id: lastId,
-            image_key: "author_aadhaar_card",
+            image_key: "critic_aadhaar_card",
             websiteType: "NFA",
-            formType: "BEST_BOOK",
-            image: authorAadhaar,
+            formType: "BEST_FILM_CRITIC",
+            image: criticAadhaar,
           });
 
           if (!fileUpload.status) {
             return response("exception", { message: "Image not uploaded.!!" });
           }
 
-          data.author_aadhaar_card = authorAadhaar.originalname ?? null;
+          data.critic_aadhaar_card = criticAadhaar.originalname ?? null;
         } else {
-          data.author_aadhaar_card = null;
+          data.critic_aadhaar_card = null;
         }
       } else {
-        data.author_aadhaar_card = null;
+        data.critic_aadhaar_card = null;
       }
+
       update = await checkForm.update(data);
       return {
         status: "success",
@@ -229,10 +240,11 @@ const BestBookCinemaController = {
     }
   },
 
-  handlePublisherEditorStep: async (data, payload) => {
+  handlePublisherStep: async (data, payload) => {
     const lastId = payload.last_id;
+
     if (lastId) {
-      const checkForm = await BestBookCinema.findOne({
+      const checkForm = await BestFilmCritic.findOne({
         where: { client_id: payload.user.id, id: lastId },
       });
 
@@ -245,9 +257,9 @@ const BestBookCinemaController = {
 
       if (
         !checkForm.active_step ||
-        checkForm.active_step < CONSTANT.stepsBestBook().PUBLISHER_EDITOR
+        checkForm.active_step < CONSTANT.stepsBestFilmCritic().PUBLISHER
       ) {
-        data.active_step = CONSTANT.stepsBestBook().PUBLISHER_EDITOR;
+        data.active_step = CONSTANT.stepsBestFilmCritic().PUBLISHER;
       }
       update = await checkForm.update(data);
       return {
@@ -261,7 +273,7 @@ const BestBookCinemaController = {
   handleDeclarationStep: async (data, payload) => {
     const lastId = payload.last_id;
 
-    const checkForm = await BestBookCinema.findOne({
+    const checkForm = await BestFilmCritic.findOne({
       where: { client_id: payload.user.id, id: lastId },
     });
 
@@ -274,9 +286,9 @@ const BestBookCinemaController = {
 
     if (
       !checkForm.active_step ||
-      checkForm.active_step < CONSTANT.stepsBestBook().DECLARATION
+      checkForm.active_step < CONSTANT.stepsBestFilmCritic().DECLARATION
     ) {
-      data.active_step = CONSTANT.stepsBestBook().DECLARATION;
+      data.active_step = CONSTANT.stepsBestFilmCritic().DECLARATION;
     }
 
     update = await checkForm.update(data);
@@ -287,4 +299,4 @@ const BestBookCinemaController = {
     };
   },
 };
-module.exports = BestBookCinemaController;
+module.exports = BestFilmCriticController;

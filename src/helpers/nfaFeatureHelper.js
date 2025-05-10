@@ -137,7 +137,7 @@ const NfaFeatureHelper = {
       }
     }
 
-    //COMPANY REGISTRATION
+    // //COMPANY REGISTRATION
     if (String(step) === String(CONSTANT.stepsFeature().COMPANY_REGISTRATION)) {
       if (!payload.last_id || isNaN(payload.last_id)) {
         errors.last_id = "Last ID is required and must be a number.";
@@ -162,7 +162,7 @@ const NfaFeatureHelper = {
       }
     }
 
-    //OTHERS
+    // //OTHERS
     if (String(step) === String(CONSTANT.stepsFeature().OTHER)) {
       if (!payload.last_id || isNaN(payload.last_id)) {
         errors.last_id = "Last ID is required and must be a number.";
@@ -219,7 +219,7 @@ const NfaFeatureHelper = {
       }
     }
 
-    //RETURN_ADDRESS
+    // //RETURN_ADDRESS
     if (String(step) === String(CONSTANT.stepsFeature().RETURN_ADDRESS)) {
       if (!payload.last_id || isNaN(payload.last_id)) {
         errors.last_id = "Last ID is required and must be a number.";

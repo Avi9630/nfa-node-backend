@@ -1,39 +1,6 @@
 const Joi = require("joi");
 
 const NfaFeatureLibrary = {
-  // GENRAL: () => {
-  //   const validatorSchema = {
-  //     last_id: Joi.number().optional(),
-  //     film_title_roman: Joi.string().required(),
-  //     film_title_devnagri: Joi.string().required(),
-  //     film_title_english: Joi.string().required(),
-  //     language: Joi.string().required(),
-  //     english_subtitle: Joi.valid(0, 1).required(),
-  //     director_debut: Joi.valid(0, 1).required(),
-  //     nom_reels_tapes: Joi.number().optional(),
-  //     aspect_ratio: Joi.string()
-  //       .pattern(/^\d+(:\d+)?$/)
-  //       .required(),
-  //     format: Joi.valid(1, 2, 3).required(),
-  //     sound_system: Joi.valid(1, 2, 3, 4).required(),
-  //     running_time: Joi.string()
-  //       .pattern(/^\d+(:\d+)?$/)
-  //       .required(),
-  //     color_bw: Joi.valid(1, 2).required(),
-  //     film_synopsis: Joi.string().optional(),
-  //   };
-
-  //   const messagesArray = {
-  //     "english_subtitle.any.only": "English Subtitle must be 0 or 1",
-  //     "director_debut.any.only": "Director debut must be 0 or 1",
-  //     "color_bw.any.only": "Color/Black&White must be 1 or 2",
-  //     "aspect_ratio.pattern.base": "Aspect ratio must be like 10:10 or 10",
-  //     "running_time.pattern.base": "Running time must be like 10:10 or 10",
-  //   };
-
-  //   return { validatorSchema, messagesArray };
-  // },
-
   consumeGENERAL: (payload) => {
     return {
       client_id: payload.user.id,
@@ -52,24 +19,6 @@ const NfaFeatureLibrary = {
       film_synopsis: payload.film_synopsis || null,
     };
   },
-
-  // CENSOR: () => {
-  //   const validatorSchema = {
-  //     last_id: Joi.number().required(),
-  //     censor_certificate_nom: Joi.string().required(),
-  //     censor_certificate_date: Joi.string()
-  //       .pattern(/^\d{4}-\d{2}-\d{2}$/)
-  //       .required(),
-  //     censor_certificate_file: Joi.any(),
-  //   };
-  //   const messagesArray = {
-  //     "censor_certificate_date.pattern.base":
-  //       "The censor certificate date does not match the format (Y-m-d).",
-  //     "censor_certificate_file.required":
-  //       "Censor certificate file is required.!!",
-  //   };
-  //   return { validatorSchema, messagesArray };
-  // },
 
   consumeCENSOR: (payload) => {
     const censorFile = payload.files?.find(
