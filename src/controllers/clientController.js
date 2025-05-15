@@ -1,30 +1,17 @@
-const SCHEMA = require("../helpers/validation_schema");
+const { NfaNonFeature } = require("../models/NfaNonFeature");
 const responseHelper = require("../helpers/responseHelper");
+const ClientSchema = require("../helpers/clientSchema");
+const { NfaFeature } = require("../models/NfaFeature");
 const Constant = require("../libraries/Constant");
-const { Client } = require("../models/Client");
 const { Twoauth } = require("../models/Twoauth");
-// const { Client, Twoauth } = require("../models");
+const { Client } = require("../models/Client");
 const Mail = require("../mailer/Mail");
 const bcrypt = require("bcryptjs");
 const moment = require("moment");
-const { NfaFeature } = require("../models/NfaFeature");
-const { NfaNonFeature } = require("../models/NfaNonFeature");
 
 const ClientController = {
-  getUserType: async (req, res) => {
-    try {
-      const types = Constant.userType();
-      return responseHelper(res, "success", {
-        message: "User types fetched successfully.!!",
-        data: types,
-      });
-    } catch (error) {
-      return responseHelper(res, "exception", { message: error.message });
-    }
-  },
-
   verifyEmail: async (req, res) => {
-    const { isValid, errors } = SCHEMA.validateVerifyEmailInput(req.body);
+    const { isValid, errors } = ClientSchema.validateVerifyEmailInput(req.body);
     if (!isValid) {
       return responseHelper(res, "validatorerrors", { errors });
     }
@@ -44,15 +31,16 @@ const ClientController = {
   },
 
   register: async (req, res) => {
-    const { isValid, errors } = SCHEMA.validateInput(req.body);
+    const { isValid, errors } = ClientSchema.validateInput(req.body);
 
     if (!isValid) {
       return responseHelper(res, "validatorerrors", { errors });
     }
-    const { isValid: isDuplicateValid, errors: duplicateErrors } =
-      await SCHEMA.checkDuplicateClient(req.body);
 
-    if (!isDuplicateValid) {
+    const { isValid: isDuplicate, errors: duplicateErrors } =
+      await ClientSchema.checkDuplicateClient(req.body);
+
+    if (!isDuplicate) {
       return responseHelper(res, "validatorerrors", { duplicateErrors });
     }
 
@@ -66,8 +54,8 @@ const ClientController = {
         mobile: req.body.mobile,
         pincode: req.body.pincode,
         aadhar_number: req.body.aadhar_number,
-        landline: req.body.landline ?? "",
-        address: req.body.address ?? "",
+        landline: req.body.landline ?? null,
+        address: req.body.address ?? null,
         usertype: req.body.usertype,
         captcha: req.body.captcha,
         username: username,
@@ -131,7 +119,7 @@ const ClientController = {
   },
 
   login: async (req, res) => {
-    const { isValid, errors } = SCHEMA.loginValidate(req.body);
+    const { isValid, errors } = ClientSchema.loginValidate(req.body);
 
     if (!isValid) {
       return responseHelper(res, "validatorerrors", { errors });
@@ -168,7 +156,7 @@ const ClientController = {
   },
 
   resetPassword: async (req, res) => {
-    const { isValid, errors } = SCHEMA.resetPasswordValidate(req.body);
+    const { isValid, errors } = ClientSchema.resetPasswordValidate(req.body);
     if (!isValid) {
       return responseHelper(res, "validatorerrors", { errors });
     }
@@ -220,7 +208,7 @@ const ClientController = {
   },
 
   verifyOtp: async (req, res) => {
-    const { isValid, errors } = SCHEMA.verifyOtpValidate(req.body);
+    const { isValid, errors } = ClientSchema.verifyOtpValidate(req.body);
     if (!isValid) {
       return responseHelper(res, "validatorerrors", { errors });
     }
@@ -268,7 +256,7 @@ const ClientController = {
   },
 
   changePassword: async (req, res) => {
-    const { isValid, errors } = SCHEMA.changePasswordValidate(req.body);
+    const { isValid, errors } = ClientSchema.changePasswordValidate(req.body);
     if (!isValid) {
       return responseHelper(res, "validatorerrors", { errors });
     }
@@ -290,7 +278,7 @@ const ClientController = {
       const hashedPassword = await bcrypt.hash(req.body.password, 10);
       client.password = hashedPassword;
 
-      await client.save(); // ✅ await it
+      await client.save();
 
       return responseHelper(res, "success", {
         message: "Password updated successfully.!!",

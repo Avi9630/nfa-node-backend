@@ -1,11 +1,12 @@
 const ClientController = require("../controllers/clientController");
+const CommonController = require("../controllers/commonController");
 const Auth = require("../middleware/auth");
 
 const express = require("express");
 const router = express.Router();
 
 // LOGIN - REGISTER
-router.get("/get-user-type", ClientController.getUserType);
+router.get("/get-user-type", CommonController.getUserType);
 router.post("/register", ClientController.register);
 router.post("/login", ClientController.login);
 
@@ -19,7 +20,7 @@ router.post("/verify-otp", ClientController.verifyOtp);
 router.post("/change-Password", ClientController.changePassword);
 
 //CLIENTS
-router.get("/get-client-details", Auth, ClientController.getClientDetails);
+// router.get("/get-client-details", Auth, ClientController.getClientDetails);
 // router.get("/delete-entry/:id", ClientController.entryDelete);
 // router.get("entry-list", ClientController.entryList);
 // router.post("logout", ClientController.logout);

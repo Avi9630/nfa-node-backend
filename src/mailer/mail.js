@@ -20,12 +20,7 @@ const Mail = {
     const frontendBaseUrl =
       process.env.FRONTEND_BASE_URL ?? "http://119.82.68.149/festival/";
 
-    // Path to the EJS template
-    const templatePath = path.join(
-      __dirname,
-      "templates",
-      "verify-registration.ejs"
-    );
+    const templatePath = path.join(__dirname, "templates", "send-token.ejs");
 
     const htmlContent = await ejs.renderFile(templatePath, {
       ...Data,
@@ -52,12 +47,7 @@ const Mail = {
     const frontendBaseUrl =
       process.env.FRONTEND_BASE_URL ?? "http://119.82.68.149/festival/";
 
-    // Path to the EJS template
-    const templatePath = path.join(
-      __dirname,
-      "templates",
-      "activation-mail.ejs"
-    );
+    const templatePath = path.join(__dirname, "templates", "verify-token.ejs");
 
     const htmlContent = await ejs.renderFile(templatePath, {
       ...Data,
@@ -81,9 +71,7 @@ const Mail = {
 
   sendOtp: async (mailContent) => {
     const { To, Subject, Data } = mailContent;
-
-    // Path to the EJS template
-    const templatePath = path.join(__dirname, "templates", "send-otp-mail.ejs");
+    const templatePath = path.join(__dirname, "templates", "send-otp.ejs");
     const htmlContent = await ejs.renderFile(templatePath, {
       ...Data,
     });

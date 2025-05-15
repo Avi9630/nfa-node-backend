@@ -17,11 +17,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 const upload = multer();
 
-// app.post("/submit", upload.any(), (req, res) => {
-//   payload = req.body;
-//   responseHelper(res, "success", { data: payload, file: req.file });
-// });
-
 // Routes
 app.use("/", routes);
 app.use("/api", upload.any(), apiRoutes);
