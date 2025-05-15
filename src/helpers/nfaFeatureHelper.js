@@ -6,12 +6,10 @@ const NfaFeatureHelper = {
     const errors = {};
     const step = payload.step;
 
-    // STEP
     if (!step || !validator.isInt(step)) {
       errors.step = "Step is required and must be a number.";
     }
 
-    // Step-based conditional validation
     if (step && step !== String(CONSTANT.stepsFeature().GENRAL)) {
       if (!payload.last_id || validator.isEmpty(String(payload.last_id))) {
         errors.last_id = "Last ID is required for this step.";
@@ -41,11 +39,14 @@ const NfaFeatureHelper = {
         errors.film_title_english = "Film title (English) is required.";
       }
 
-      if (!payload.language || validator.isEmpty(payload.language.trim())) {
-        errors.language = "Language is required.";
+      if (
+        !payload.language_id ||
+        !Array.isArray(payload.language_id) ||
+        payload.language_id.length === 0
+      ) {
+        errors.language_id = "Language is required and must be an array.!";
       }
 
-      // Required and in:0,1
       if (!["0", "1", 0, 1].includes(payload.english_subtitle)) {
         errors.english_subtitle = "English Subtitle must be. Ex:- 0 or 1";
       }
@@ -54,7 +55,6 @@ const NfaFeatureHelper = {
         errors.director_debut = "Director debut must be. Ex:- 0 or 1";
       }
 
-      // Optional numeric
       if (
         payload.nom_reels_tapes &&
         !validator.isNumeric(String(payload.nom_reels_tapes))
@@ -309,8 +309,6 @@ const NfaFeatureHelper = {
         errors.declaration_eight = "Declaration is must be Yes(1).!!";
       }
     }
-
-    // More steps to go
 
     return {
       isValid: Object.keys(errors).length === 0,

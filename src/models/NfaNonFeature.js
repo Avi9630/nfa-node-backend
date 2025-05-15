@@ -33,9 +33,17 @@ const NfaNonFeature = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
-    language: {
-      type: DataTypes.STRING,
+    language_id: {
+      type: DataTypes.TEXT,
       allowNull: true,
+      get() {
+        const rawValue = this.getDataValue("language_id");
+        try {
+          return rawValue ? JSON.parse(rawValue) : [];
+        } catch (e) {
+          return [];
+        }
+      },
     },
     english_subtitle: {
       type: DataTypes.STRING,

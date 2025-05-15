@@ -316,9 +316,13 @@ const ClientController = {
         feature = await NfaFeature.findAll({
           where: { client_id: req.user.id },
         });
+
         nonFeature = await NfaNonFeature.findAll({
           where: { client_id: req.user.id },
         });
+
+        console.log(feature);
+        return "Controller";
 
         // data.feature = feature;
         // data.nonFeature = nonFeature;

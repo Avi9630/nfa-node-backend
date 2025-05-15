@@ -12,7 +12,6 @@ const NfaFeature = sequelize.define(
       autoIncrement: true,
       primaryKey: true,
     },
-
     step: { type: DataTypes.INTEGER, allowNull: true },
     active_step: { type: DataTypes.TINYINT, allowNull: true },
     payment_status: { type: DataTypes.TINYINT, allowNull: true },
@@ -33,9 +32,17 @@ const NfaFeature = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
-    language: {
-      type: DataTypes.STRING,
+    language_id: {
+      type: DataTypes.TEXT,
       allowNull: true,
+      get() {
+        const rawValue = this.getDataValue("language_id");
+        try {
+          return rawValue ? JSON.parse(rawValue) : [];
+        } catch (e) {
+          return [];
+        }
+      },
     },
     english_subtitle: {
       type: DataTypes.STRING,
@@ -199,35 +206,35 @@ const NfaFeature = sequelize.define(
     },
     declaration_one: {
       type: DataTypes.TINYINT,
-      allowNull: false,
+      allowNull: true,
     },
     declaration_two: {
       type: DataTypes.TINYINT,
-      allowNull: false,
+      allowNull: true,
     },
     declaration_three: {
       type: DataTypes.TINYINT,
-      allowNull: false,
+      allowNull: true,
     },
     declaration_four: {
       type: DataTypes.TINYINT,
-      allowNull: false,
+      allowNull: true,
     },
     declaration_five: {
       type: DataTypes.TINYINT,
-      allowNull: false,
+      allowNull: true,
     },
     declaration_six: {
       type: DataTypes.TINYINT,
-      allowNull: false,
+      allowNull: true,
     },
     declaration_seven: {
       type: DataTypes.TINYINT,
-      allowNull: false,
+      allowNull: true,
     },
     declaration_eight: {
       type: DataTypes.TINYINT,
-      allowNull: false,
+      allowNull: true,
     },
 
     created_at: { type: DataTypes.TIME },

@@ -6,12 +6,10 @@ const NfaNonFeatureHelper = {
     const errors = {};
     const step = payload.step;
 
-    // STEP
     if (!step || !validator.isInt(step)) {
       errors.step = "Step is required and must be a number.";
     }
 
-    // Step-based conditional validation
     if (step && step !== String(CONSTANT.stepsFeature().GENRAL)) {
       if (!payload.last_id || validator.isEmpty(String(payload.last_id))) {
         errors.last_id = "Last ID is required for this step.";
@@ -41,11 +39,14 @@ const NfaNonFeatureHelper = {
         errors.film_title_english = "Film title (English) is required.";
       }
 
-      if (!payload.language || validator.isEmpty(payload.language.trim())) {
-        errors.language = "Language is required.";
+      if (
+        !payload.language_id ||
+        !Array.isArray(payload.language_id) ||
+        payload.language_id.length === 0
+      ) {
+        errors.language_id = "Language is required and must be an array.!";
       }
 
-      // Required and in:0,1
       if (!["0", "1", 0, 1].includes(payload.english_subtitle)) {
         errors.english_subtitle = "English Subtitle must be. Ex:- 0 or 1";
       }
@@ -170,37 +171,6 @@ const NfaNonFeatureHelper = {
         errors.last_id = "Last ID is required and must be a number.";
       }
 
-      // if (
-      //   !payload.original_screenplay_name ||
-      //   validator.isEmpty(payload.original_screenplay_name.trim())
-      // ) {
-      //   errors.original_screenplay_name =
-      //     "Original screenplay name is required.";
-      // }
-
-      // if (
-      //   !payload.adapted_screenplay_name ||
-      //   validator.isEmpty(payload.adapted_screenplay_name.trim())
-      // ) {
-      //   errors.adapted_screenplay_name = "Adapted screenplay name is required.";
-      // }
-
-      // if (
-      //   !payload.story_writer_name ||
-      //   validator.isEmpty(payload.story_writer_name.trim())
-      // ) {
-      //   errors.story_writer_name = "Story writer name is required.";
-      // }
-
-      // if (
-      //   payload.work_under_public_domain !== undefined &&
-      //   payload.work_under_public_domain !== null &&
-      //   !["1", "2", 1, 2].includes(payload.work_under_public_domain)
-      // ) {
-      //   errors.work_under_public_domain =
-      //     "Public domain must be 1 or 2 if provided.";
-      // }
-
       if (
         payload.shot_digital_video_format !== undefined &&
         payload.shot_digital_video_format !== null &&
@@ -209,16 +179,6 @@ const NfaNonFeatureHelper = {
         errors.shot_digital_video_format =
           "Short digital must be 1 or 2 if provided.";
       }
-
-      // const censorFile = files?.find(
-      //   (file) => file.fieldname === "original_work_copy"
-      // );
-
-      // if (censorFile) {
-      //   if (typeof censorFile !== "object" || !censorFile.mimetype) {
-      //     errors.original_work_copy = "Work copy must be a valid file.";
-      //   }
-      // }
     }
 
     //RETURN_ADDRESS
@@ -311,8 +271,6 @@ const NfaNonFeatureHelper = {
         errors.declaration_eight = "Declaration is must be Yes(1).!!";
       }
     }
-
-    // More steps to go
 
     return {
       isValid: Object.keys(errors).length === 0,

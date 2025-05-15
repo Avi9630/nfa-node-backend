@@ -96,11 +96,11 @@ const nfaNonFeatureController = {
             data: result?.data || {},
           });
         }
+      } else {
+        responseHelper(res, "badrequest", {
+          message: "Something went wrong.!!",
+        });
       }
-
-      responseHelper(res, "badrequest", {
-        message: "Something went wrong.!!",
-      });
     } catch (error) {
       responseHelper(res, "exception", { message: error.message });
     }
@@ -110,7 +110,7 @@ const nfaNonFeatureController = {
     const lastId = payload.last_id || null;
 
     if (lastId) {
-      const checkForm = await NfaFeature.findOne({
+      const checkForm = await NfaNonFeature.findOne({
         where: { client_id: data.client_id, id: lastId },
       });
 

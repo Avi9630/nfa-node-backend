@@ -2,12 +2,15 @@ const Joi = require("joi");
 
 const NfaNonFeatureLibrary = {
   consumeGENERAL: (payload) => {
+    if (typeof payload.language_id === "object") {
+      languageIds = JSON.stringify(payload.language_id);
+    }
     return {
       client_id: payload.user.id,
       film_title_roman: payload.film_title_roman,
       film_title_devnagri: payload.film_title_devnagri,
       film_title_english: payload.film_title_english,
-      language: payload.language,
+      language_id: languageIds,
       english_subtitle: payload.english_subtitle,
       director_debut: payload.director_debut,
       nom_reels_tapes: payload.nom_reels_tapes || null,

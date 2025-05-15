@@ -6,14 +6,7 @@ const ImageLib = require("../libraries/ImageLib");
 const CONSTANT = require("../libraries/Constant");
 const NfaFeatureHelper = require("../helpers/nfaFeatureHelper");
 
-const {
-  // NfaFeature,
-  Producer,
-  Director,
-  Song,
-  Actor,
-  Audiographer,
-} = require("../models");
+const { Producer, Director, Song, Actor, Audiographer } = require("../models");
 
 // const Mail = require("../mailer/Mail");
 
@@ -107,12 +100,18 @@ const nfaFeatureController = {
             errors: result?.error || {},
           });
         }
-        return responseHelper(res, "success", { data: result });
-      }
 
-      responseHelper(res, "badrequest", {
-        message: "Invalid step provided.!!",
-      });
+        if (result?.status === "success") {
+          return responseHelper(res, "success", {
+            message: result?.message,
+            data: result?.data || {},
+          });
+        }
+      } else {
+        responseHelper(res, "badrequest", {
+          message: "Invalid step provided.!!",
+        });
+      }
     } catch (error) {
       responseHelper(res, "exception", { message: error.message });
     }
@@ -139,13 +138,16 @@ const nfaFeatureController = {
       ) {
         data.active_step = CONSTANT.stepsFeature().GENRAL;
       }
+
       update = await checkForm.update(data);
+
       return {
         status: "success",
         message: "Records updated successfully.!!",
         data: update,
       };
     }
+
     data.active_step = payload.step;
     create = await NfaFeature.createFeature(data);
     return {
