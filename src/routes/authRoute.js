@@ -6,8 +6,10 @@ const NfaFeatureController = require("../controllers/nfaFeatureController");
 const ProducerController = require("../controllers/producerController");
 const DirectorController = require("../controllers/directorController");
 const ClientController = require("../controllers/clientController");
+const EditorController = require("../controllers/editorController");
 const ActorController = require("../controllers/actorController");
 const SongController = require("../controllers/songController");
+const BookController = require("../controllers/bookController");
 
 const express = require("express");
 const router = express.Router();
@@ -45,6 +47,7 @@ router.post(
   "/best-film-critic-final-submit",
   BestFilmCriticController.finalSubmit
 );
+
 // router.get(
 //   "/best-film-critic-entry-by/:id",
 //   BestFilmCriticController.bestFilmCriticById
@@ -100,12 +103,12 @@ router.get("/get-book-by/:id", BookController.getBook);
 router.get("/delete-book/:id", BookController.deleteBook);
 
 // ****************************EDITORS********************************//
-// router.post("/store-editor", EditorController.storeEditor);
-// router.post("/update-editor", EditorController.updateEditor);
-// router.post("/list-editor", EditorController.listEditor);
-// router.get("/get-editor-by/:id", EditorController.getEditor);
-// router.get("/delete-editor/:id", EditorController.deleteEditor);
+router.post("/store-editor", EditorController.storeEditor);
+router.post("/update-editor", EditorController.updateEditor);
+router.post("/list-editor", EditorController.listEditor);
+router.get("/get-editor-by/:id", EditorController.getEditor);
+router.get("/delete-editor/:id", EditorController.deleteEditor);
 
 //*****************************LANGUAGE*******************************//
-router.get("/get-all-languages", CommonController.deleteEditor);
+// router.get("/get-all-languages", CommonController.deleteEditor);
 module.exports = router;

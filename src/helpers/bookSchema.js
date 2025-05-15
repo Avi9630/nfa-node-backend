@@ -2,7 +2,7 @@ const { string } = require("joi");
 var validator = require("validator");
 
 const BookSchema = {
-  validateStore: (data, files) => {
+  validateStore: (data) => {
     const errors = {};
 
     const trimmedData = Object.keys(data).reduce((acc, key) => {
@@ -10,71 +10,60 @@ const BookSchema = {
       return acc;
     }, {});
 
-    if (!trimmedData.nfa_feature_id && !trimmedData.nfa_non_feature_id) {
-      errors.nfa_feature_id =
-        "Either NFA feature ID or NFA non-feature ID is required!";
-      errors.nfa_non_feature_id =
-        "Either NFA feature ID or NFA non-feature ID is required!";
+    if (!trimmedData.best_book_cinemas_id) {
+      errors.best_book_cinemas_id = "Best book cinema id is required.!!";
     }
 
-    if (!trimmedData.indian_national) {
-      errors.indian_national = "Nationality is required!";
-    } else if (!["0", "1"].includes(trimmedData.indian_national)) {
-      errors.indian_national = "Nationality must be 0 or 1!";
+    if (!trimmedData.book_title_original) {
+      errors.book_title_original = "Book title original is required.!!";
+    }
+
+    if (!trimmedData.book_title_english) {
+      errors.book_title_english = "Book title english is required.!!";
+    }
+
+    if (!trimmedData.english_translation_book) {
+      errors.english_translation_book =
+        "English translation book is required.!!";
     }
 
     if (
-      trimmedData.receive_producer_award !== undefined &&
-      trimmedData.receive_producer_award !== null &&
-      !["1", 1].includes(trimmedData.receive_producer_award)
+      !trimmedData.language_id ||
+      !Array.isArray(trimmedData.language_id) ||
+      trimmedData.language_id.length === 0
     ) {
-      errors.receive_producer_award =
-        "Receive producer award must be Yes(1) if provided.";
+      errors.language_id = "Language is required and must be an array.!";
     }
 
-    if (trimmedData.indian_national === "0") {
-      if (!trimmedData.country_of_nationality) {
-        errors.country_of_nationality = "Country of nationality is required!";
-      }
+    if (!trimmedData.author_name) {
+      errors.author_name = "Author name is required.!!";
     }
 
-    if (!trimmedData.name) {
-      errors.name = "Producer name is required!";
+    if (!trimmedData.page_count) {
+      errors.page_count = "Page count is required.!!";
     }
 
-    if (!trimmedData.email) {
-      errors.email = "Email is required!";
-    } else if (!validator.isEmail(trimmedData.email)) {
-      errors.email = "Invalid email format!";
+    if (
+      !trimmedData.date_of_publication ||
+      !validator.isDate(trimmedData.date_of_publication, {
+        format: "YYYY-MM-DD",
+        strictMode: true,
+      })
+    ) {
+      errors.date_of_publication =
+        "Date of application is required and must be in YYYY-MM-DD format.";
     }
 
-    if (!trimmedData.contact_nom) {
-      errors.contact_nom = "Contact number is required!";
-    } else if (!validator.isMobilePhone(trimmedData.contact_nom, "en-IN")) {
-      errors.contact_nom =
-        "Contact number must be a valid 10-digit Indian number!";
-    }
-
-    if (!trimmedData.pincode || validator.isEmpty(trimmedData.pincode.trim())) {
-      errors.pincode = "Pincode is required";
-    } else if (!validator.matches(trimmedData.pincode, /^\d{6}$/)) {
-      errors.pincode = "Pincode must be 6 digits";
-    }
-
-    if (!trimmedData.address) {
-      errors.address = "Address is required!";
-    }
-
-    const producerDoc = files?.find(
-      (file) => file.fieldname === "producer_self_attested_doc"
-    );
-
-    if (!producerDoc) {
-      errors.producer_self_attested_doc =
-        "Producer self-attested document is required!";
-    } else if (!producerDoc.mimetype.startsWith("application/")) {
-      errors.producer_self_attested_doc =
-        "Invalid file format for producer self-attested document!";
+    if (!trimmedData.book_price) {
+      errors.book_price = "Book price is required.!!";
+    } else if (
+      !validator.isDecimal(trimmedData.book_price.toString(), {
+        force_decimal: false,
+      })
+    ) {
+      errors.book_price = "Book price must be a valid number.";
+    } else if (parseFloat(trimmedData.book_price) <= 0) {
+      errors.book_price = "Book price must be greater than 0.";
     }
 
     return {
@@ -83,7 +72,7 @@ const BookSchema = {
     };
   },
 
-  validateUpdate: (data, files) => {
+  validateUpdate: (data) => {
     const errors = {};
 
     const trimmedData = Object.keys(data).reduce((acc, key) => {
@@ -95,82 +84,40 @@ const BookSchema = {
       errors.id = "ID is required and must be a number.!!";
     }
 
-    const isEmpty = (value) =>
-      value === undefined || value === null || value === "";
-    const isNotNumber = (value) => isNaN(String(value));
-
-    if (
-      (isEmpty(trimmedData.nfa_feature_id) ||
-        isNotNumber(trimmedData.nfa_feature_id)) &&
-      (isEmpty(trimmedData.nfa_non_feature_id) ||
-        isNotNumber(trimmedData.nfa_non_feature_id))
-    ) {
-      errors.nfa_feature_id =
-        "Either a valid NFA feature ID or NFA non-feature ID is required!";
-      errors.nfa_non_feature_id =
-        "Either a valid NFA feature ID or NFA non-feature ID is required!";
-    }
-
-    if (trimmedData.indian_national === "0") {
-      if (!trimmedData.country_of_nationality) {
-        errors.country_of_nationality = "Country of nationality is required!";
-      }
+    if (!trimmedData.best_book_cinemas_id) {
+      errors.best_book_cinemas_id = "Best book cinema id is required.!!";
     }
 
     if (
-      trimmedData.receive_producer_award !== undefined &&
-      trimmedData.receive_producer_award !== null &&
-      !["1", 1].includes(trimmedData.receive_producer_award)
+      trimmedData.language_id !== undefined &&
+      trimmedData.language_id !== null &&
+      !Array.isArray(trimmedData.language_id)
     ) {
-      errors.receive_producer_award =
-        "Receive producer award must be Yes(1) if provided.";
+      errors.language_id = "Language must be an array.!";
     }
 
     if (
-      trimmedData.indian_national !== undefined &&
-      trimmedData.indian_national !== null &&
-      !["0", "1", 0, 1].includes(trimmedData.indian_national)
+      trimmedData.date_of_publication !== undefined &&
+      trimmedData.date_of_publication !== null &&
+      !validator.isDate(trimmedData.date_of_publication, {
+        format: "YYYY-MM-DD",
+        strictMode: true,
+      })
     ) {
-      errors.indian_national = "Indian national must be 0 OR 1.!!";
+      errors.date_of_publication =
+        "Date of application must be in YYYY-MM-DD format.!!";
     }
 
     if (
-      trimmedData.email !== undefined &&
-      trimmedData.email !== null &&
-      !validator.isEmail(trimmedData.email)
+      trimmedData.book_price !== undefined &&
+      trimmedData.book_price !== null &&
+      !validator.isDecimal(trimmedData.book_price.toString(), {
+        force_decimal: false,
+      })
     ) {
-      errors.email = "Invalid email format!";
-    }
-
-    if (
-      trimmedData.contact_nom &&
-      typeof trimmedData.contact_nom === "string" &&
-      !validator.isMobilePhone(trimmedData.contact_nom, "en-IN")
-    ) {
-      errors.contact_nom = "Mobile must be a valid 10-digit Indian number";
-    }
-
-    // if (!validator.matches(trimmedData.pincode, /^\d{6}$/)) {
-    //   errors.pincode = "Pincode must be 6 digits";
-    // }
-
-    if (
-      trimmedData.pincode &&
-      typeof trimmedData.pincode === "string" &&
-      !validator.matches(trimmedData.pincode, /^\d{6}$/)
-    ) {
-      errors.pincode = "Pincode must be a valid 6-digit number";
-    }
-
-    const producerDoc = files?.find(
-      (file) => file.fieldname === "producer_self_attested_doc"
-    );
-
-    if (producerDoc) {
-      if (!producerDoc.mimetype.startsWith("application/")) {
-        errors.producer_self_attested_doc =
-          "Invalid file format! Only document files are allowed.";
-      }
+      errors.book_price = "Book price must be a valid number.";
+    } else if (parseFloat(trimmedData.book_price) <= 0) {
+      errors.book_price = "Book price must be greater than 0.";
     }
 
     return {
@@ -179,7 +126,7 @@ const BookSchema = {
     };
   },
 
-  validateListProducer: (data) => {
+  validateList: (data) => {
     const errors = {};
 
     const trimmedData = Object.keys(data).reduce((acc, key) => {
@@ -187,20 +134,8 @@ const BookSchema = {
       return acc;
     }, {});
 
-    const isEmpty = (value) =>
-      value === undefined || value === null || value === "";
-    const isNotNumber = (value) => isNaN(String(value));
-
-    if (
-      (isEmpty(trimmedData.nfa_feature_id) ||
-        isNotNumber(trimmedData.nfa_feature_id)) &&
-      (isEmpty(trimmedData.nfa_non_feature_id) ||
-        isNotNumber(trimmedData.nfa_non_feature_id))
-    ) {
-      errors.nfa_feature_id =
-        "Either a valid NFA feature ID or NFA non-feature ID is required!";
-      errors.nfa_non_feature_id =
-        "Either a valid NFA feature ID or NFA non-feature ID is required!";
+    if (!trimmedData.best_book_cinemas_id) {
+      errors.best_book_cinemas_id = "Best book cinema id is required.!!";
     }
 
     return {
