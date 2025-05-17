@@ -4,6 +4,7 @@ const responseHelper = require("../helpers/responseHelper");
 const { NfaFeature } = require("../models/NfaFeature");
 const { Producer } = require("../models/Producer");
 const ImageLib = require("../libraries/ImageLib");
+const { Document } = require("../models/Document");
 
 const ProducerController = {
   storeProducer: async (req, res) => {
@@ -104,6 +105,7 @@ const ProducerController = {
       }
       return responseHelper(res, "created", {
         message: "Producer created successfully.!!",
+        data: producer,
       });
     } catch (error) {
       return responseHelper(res, "exception", { message: error.message });
@@ -161,7 +163,6 @@ const ProducerController = {
         nfa_feature_id: payload.nfa_feature_id ?? producer.nfa_feature_id,
         nfa_non_feature_id:
           payload.nfa_non_feature_id ?? producer.nfa_non_feature_id,
-        indian_national: payload.indian_national ?? producer.indian_national,
         name: payload.name ?? producer.name,
         receive_producer_award:
           payload.receive_producer_award ?? producer.receive_producer_award,
@@ -169,14 +170,26 @@ const ProducerController = {
         email: payload.email ?? producer.email,
         address: payload.address ?? producer.address,
         pincode: payload.pincode ?? producer.pincode,
-        country_of_nationality:
-          payload.country_of_nationality ?? producer.country_of_nationality,
+        indian_national: payload.indian_national ?? producer.indian_national,
         producer_self_attested_doc:
           payload.producer_self_attested_doc ??
           producer.producer_self_attested_doc,
         production_company:
           payload.production_company ?? producer.production_company,
       };
+
+      // country_of_nationality: payload.country_of_nationality ??
+      //   producer.country_of_nationality,
+
+      if (req.body.indian_national === "0") {
+        updatedData.country_of_nationality = req.body.country_of_nationality;
+      } else {
+        updatedData.country_of_nationality = producer.country_of_nationality;
+      }
+
+      if (req.body.indian_national === "1") {
+        updatedData.country_of_nationality = null;
+      }
 
       if (Array.isArray(payload.files)) {
         const producerFile = payload.files.find(
@@ -206,6 +219,7 @@ const ProducerController = {
           return responseHelper(res, "success", { data: producer });
         }
       }
+
       responseHelper(res, "exception", { message: error.message });
     } catch (error) {
       return responseHelper(res, "exception", { message: error.message });
@@ -271,9 +285,26 @@ const ProducerController = {
         ...req.params,
         user: req.user,
       };
+
       const producer = await Producer.findOne({
-        where: { id: payload.id, client_id: payload.user.id },
+        where: {
+          id: payload.id,
+          client_id: payload.user.id,
+        },
+        include: [
+          {
+            model: Document,
+            as: "documents",
+            where: {
+              form_type: 1,
+              website_type: 5,
+              document_type: 4,
+            },
+            required: false,
+          },
+        ],
       });
+
       if (producer) {
         responseHelper(res, "success", { data: producer });
       } else {

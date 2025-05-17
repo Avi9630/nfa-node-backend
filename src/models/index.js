@@ -1,6 +1,4 @@
 const { Sequelize } = require("sequelize");
-// const { NfaFeature } = require("../models/NfaFeature");
-// const { Document } = require("../models/Document");
 const dotenv = require("dotenv");
 dotenv.config();
 
@@ -14,18 +12,4 @@ const sequelize = new Sequelize(
     logging: false,
   }
 );
-
-// const models = {
-//   NfaFeature,
-//   Document,
-// };
-
-// Object.values(models).forEach((model) => {
-//   console.log(model);
-
-//   if (model.associate) {
-//     model.associate(models);
-//   }
-// });
-
 module.exports = sequelize;

@@ -23,13 +23,9 @@ const ProducerSchema = {
       errors.indian_national = "Nationality must be 0 or 1!";
     }
 
-    if (
-      trimmedData.receive_producer_award !== undefined &&
-      trimmedData.receive_producer_award !== null &&
-      !["1", 1].includes(trimmedData.receive_producer_award)
-    ) {
+    if (!["0", "1", 0, 1].includes(trimmedData.receive_producer_award)) {
       errors.receive_producer_award =
-        "Receive producer award must be Yes(1) if provided.";
+        "Receive producer award must be 0 OR 1 if provided.!!";
     }
 
     if (trimmedData.indian_national === "0") {
@@ -120,10 +116,10 @@ const ProducerSchema = {
     if (
       trimmedData.receive_producer_award !== undefined &&
       trimmedData.receive_producer_award !== null &&
-      !["1", 1].includes(trimmedData.receive_producer_award)
+      !["0", "1", 0, 1].includes(trimmedData.receive_producer_award)
     ) {
       errors.receive_producer_award =
-        "Receive producer award must be Yes(1) if provided.";
+        "Receive producer award must be 0 OR 1 if provided.!!";
     }
 
     if (

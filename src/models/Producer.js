@@ -1,5 +1,6 @@
 const { DataTypes } = require("sequelize");
 const sequelize = require(".");
+const { Document } = require("./Document");
 
 const Producer = sequelize.define(
   "Producer",
@@ -90,48 +91,10 @@ const Producer = sequelize.define(
   }
 );
 
-const generateUsername = async (usertype) => {
-  const prefixes = { 1: "PRO000", 2: "PUB000", default: "OTR000" };
-  const prefix = prefixes[usertype] || prefixes.default;
-
-  const latestUser = await Client.findOne({
-    where: { usertype },
-    order: [["id", "DESC"]],
-    attributes: ["username"],
-  });
-
-  const numPart = latestUser?.username
-    ? parseInt(latestUser.username.replace(prefix, "")) || 0
-    : 0;
-  return `${prefix}${numPart + 1}`;
-};
-
-const findByCredential = async (clientEmail, clientPassword) => {
-  const email = clientEmail.trim().toLowerCase();
-  const client = await Client.findOne({ where: { email } });
-
-  if (!client) {
-    throw new Error("No account found with this email address.!!");
-  }
-
-  if (!client.active) {
-    throw new Error(
-      "Account not activated. Please check your email for activation link.!!"
-    );
-  }
-
-  const isMatch = await bcrypt.compare(clientPassword, client.password);
-  if (!isMatch) {
-    throw new Error("Incorrect password");
-  }
-  return client;
-};
-
-const generateAuthToken = async (client) => {
-  const token = jwt.sign({ id: client.id.toString() }, process.env.JWT_SECRET, {
-    expiresIn: "1h",
-  });
-  return token;
-};
+Producer.hasMany(Document, {
+  foreignKey: "context_id",
+  sourceKey: "id",
+  as: "documents",
+});
 
 module.exports = { Producer };

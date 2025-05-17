@@ -1,7 +1,7 @@
 const LibrariesNFAFeature = require("../libraries/NfaFeatureLibrary");
 const CONSTANT = require("../libraries/Constant");
 const { DataTypes } = require("sequelize");
-const sequelize = require("../models");
+const sequelize = require(".");
 const Joi = require("joi");
 
 const NfaFeature = sequelize.define(
