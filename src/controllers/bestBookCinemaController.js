@@ -4,6 +4,9 @@ const { BestBookCinema } = require("../models/BestBookCinema");
 const CONSTANT = require("../libraries/Constant");
 const ImageLib = require("../libraries/ImageLib");
 const { Client } = require("../models/Client");
+const { Book } = require("../models/Book");
+const { Editor } = require("../models/Editor");
+const { Document } = require("../models/Document");
 
 const BestBookCinemaController = {
   Entry: async (req, res) => {
@@ -285,6 +288,64 @@ const BestBookCinemaController = {
       message: "Records updated successfully.!!",
       data: update,
     };
+  },
+  bestBookById: async (req, res) => {
+    const payload = {
+      ...req.params,
+      user: req.user,
+    };
+
+    try {
+      const bestBookCinema = await BestBookCinema.findOne({
+        where: {
+          id: payload.id,
+          client_id: payload.user.id,
+        },
+        include: [
+          {
+            model: Document,
+            as: "documents",
+            where: {
+              form_type: 3,
+              website_type: 5,
+              document_type: 7,
+              // document_type: {
+              //   [Op.in]: [1, 2, 3],
+              // },
+            },
+            required: false,
+          },
+        ],
+      });
+
+      if (!bestBookCinema) {
+        return res.status(404).json({
+          status: "exception",
+          message: "Something went wrong!!",
+        });
+      }
+
+      const [books, editors] = await Promise.all([
+        Book.findAll({ where: { best_book_cinemas_id: bestBookCinema.id } }),
+        Editor.findAll({ where: { best_book_cinema_id: bestBookCinema.id } }),
+      ]);
+
+      const data = {
+        ...bestBookCinema.toJSON(),
+        books,
+        editors,
+      };
+      return res.status(200).json({
+        status: "success",
+        message: "Success.!!",
+        data,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "exception",
+        message: error.message,
+      });
+    }
   },
 };
 module.exports = BestBookCinemaController;

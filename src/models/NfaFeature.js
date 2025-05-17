@@ -1,6 +1,7 @@
 const LibrariesNFAFeature = require("../libraries/NfaFeatureLibrary");
 const CONSTANT = require("../libraries/Constant");
 const { DataTypes } = require("sequelize");
+const { Document } = require("./Document");
 const sequelize = require(".");
 const Joi = require("joi");
 
@@ -250,6 +251,12 @@ const NfaFeature = sequelize.define(
     // },
   }
 );
+
+NfaFeature.hasMany(Document, {
+  foreignKey: "context_id",
+  sourceKey: "id",
+  as: "documents",
+});
 
 NfaFeature.associate = function (models) {
   NfaFeature.hasMany(models.Document, {

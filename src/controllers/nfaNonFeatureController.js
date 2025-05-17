@@ -1,9 +1,13 @@
 const NfaNonFeatureHelper = require("../helpers/nfaNonFeatureHelper");
 const responseHelper = require("../helpers/responseHelper");
 const { NfaNonFeature } = require("../models/NfaNonFeature");
+const { Document } = require("../models/Document");
+const { Producer } = require("../models/Producer");
+const { Director } = require("../models/Director");
 const ImageLib = require("../libraries/ImageLib");
 const CONSTANT = require("../libraries/Constant");
 const { Client } = require("../models/Client");
+const { Op } = require("sequelize");
 
 const nfaNonFeatureController = {
   Entry: async (req, res) => {
@@ -553,6 +557,93 @@ const nfaNonFeatureController = {
       });
     } catch (error) {
       return responseHelper(res, "exception", { message: error.message });
+    }
+  },
+
+  nonFeatureById: async (req, res) => {
+    const payload = {
+      ...req.params,
+      user: req.user,
+    };
+
+    try {
+      const nfaNonFeature = await NfaNonFeature.findOne({
+        where: {
+          id: payload.id,
+          client_id: payload.user.id,
+        },
+        include: [
+          {
+            model: Document,
+            as: "documents",
+            where: {
+              form_type: 2,
+              website_type: 5,
+              document_type: {
+                [Op.in]: [1, 2, 3],
+              },
+            },
+            required: false,
+          },
+        ],
+      });
+
+      if (!nfaNonFeature) {
+        return res.status(404).json({
+          status: "exception",
+          message: "Something went wrong!!",
+        });
+      }
+
+      const [producers, directors] = await Promise.all([
+        Producer.findAll({
+          where: { nfa_non_feature_id: nfaNonFeature.id },
+          include: [
+            {
+              model: Document,
+              as: "documents",
+              where: {
+                form_type: 2,
+                website_type: 5,
+                document_type: 4,
+              },
+              required: false,
+            },
+          ],
+        }),
+        Director.findAll({
+          where: { nfa_non_feature_id: nfaNonFeature.id },
+          include: [
+            {
+              model: Document,
+              as: "documents",
+              where: {
+                form_type: 2,
+                website_type: 5,
+                document_type: 5,
+              },
+              required: false,
+            },
+          ],
+        }),
+      ]);
+
+      const data = {
+        ...nfaNonFeature.toJSON(),
+        producers,
+        directors,
+      };
+
+      return res.status(200).json({
+        status: "success",
+        message: "Success.!!",
+        data,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        status: "exception",
+        message: error.message,
+      });
     }
   },
 };

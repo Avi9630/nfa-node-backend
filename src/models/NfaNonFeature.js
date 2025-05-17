@@ -1,5 +1,6 @@
 const LibrariesNFANonFeature = require("../libraries/NfaNonFeatureLibrary");
 const CONSTANT = require("../libraries/Constant");
+const { Document } = require("./Document");
 const { DataTypes } = require("sequelize");
 const sequelize = require(".");
 const Joi = require("joi");
@@ -251,6 +252,12 @@ const NfaNonFeature = sequelize.define(
     // },
   }
 );
+
+NfaNonFeature.hasMany(Document, {
+  foreignKey: "context_id",
+  sourceKey: "id",
+  as: "documents",
+});
 
 const validateData = async (payload) => {
   const messages = {};

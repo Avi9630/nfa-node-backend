@@ -1,12 +1,17 @@
+// const { Producer, Director, Song, Actor, Audiographer } = require("../models");
+const NfaFeatureHelper = require("../helpers/nfaFeatureHelper");
 const responseHelper = require("../helpers/responseHelper");
 const { NfaFeature } = require("../models/NfaFeature");
-const { Client } = require("../models/Client");
+const { Audiographer } = require("../models/Audiographer");
 const { Document } = require("../models/Document");
+const { Producer } = require("../models/Producer");
+const { Director } = require("../models/Director");
+const { Actor } = require("../models/Actor");
+const { Song } = require("../models/Song");
 const ImageLib = require("../libraries/ImageLib");
 const CONSTANT = require("../libraries/Constant");
-const NfaFeatureHelper = require("../helpers/nfaFeatureHelper");
-
-const { Producer, Director, Song, Actor, Audiographer } = require("../models");
+const { Client } = require("../models/Client");
+const { Op } = require("sequelize");
 
 // const Mail = require("../mailer/Mail");
 
@@ -573,17 +578,25 @@ const nfaFeatureController = {
 
     try {
       const nfaFeature = await NfaFeature.findOne({
-        where: { id: payload.id, client_id: payload.user.id },
+        where: {
+          id: payload.id,
+          client_id: payload.user.id,
+        },
         include: [
           {
             model: Document,
             as: "documents",
+            where: {
+              form_type: 1,
+              website_type: 5,
+              document_type: {
+                [Op.in]: [1, 2, 3],
+              },
+            },
+            required: false,
           },
         ],
       });
-
-      console.log(nfaFeature);
-      return "From Controller";
 
       if (!nfaFeature) {
         return res.status(404).json({
@@ -596,11 +609,33 @@ const nfaFeatureController = {
         await Promise.all([
           Producer.findAll({
             where: { nfa_feature_id: nfaFeature.id },
-            include: ["documents"],
+            include: [
+              {
+                model: Document,
+                as: "documents",
+                where: {
+                  form_type: 1,
+                  website_type: 5,
+                  document_type: 4,
+                },
+                required: false,
+              },
+            ],
           }),
           Director.findAll({
             where: { nfa_feature_id: nfaFeature.id },
-            include: ["documents"],
+            include: [
+              {
+                model: Document,
+                as: "documents",
+                where: {
+                  form_type: 1,
+                  website_type: 5,
+                  document_type: 5,
+                },
+                required: false,
+              },
+            ],
           }),
           Song.findAll({ where: { nfa_feature_id: nfaFeature.id } }),
           Actor.findAll({ where: { nfa_feature_id: nfaFeature.id } }),
@@ -615,7 +650,6 @@ const nfaFeatureController = {
         actors,
         audiographer,
       };
-
       return res.status(200).json({
         status: "success",
         message: "Success.!!",

@@ -1,6 +1,6 @@
 const { DataTypes } = require("sequelize");
-const sequelize = require(".");
 const { Document } = require("./Document");
+const sequelize = require(".");
 
 const Producer = sequelize.define(
   "Producer",

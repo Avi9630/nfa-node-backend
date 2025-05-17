@@ -23,12 +23,12 @@ router.post("/logout", ClientController.logout);
 //************************FEATURE********************//
 router.post("/feature-entry", NfaFeatureController.Entry);
 router.post("/feature-final-submit", NfaFeatureController.finalSubmit);
-// router.get("/feature-entry-by/:id", NfaFeatureController.featureById);
+router.get("/feature-entry-by/:id", NfaFeatureController.featureById);
 
 //************************NON-FEATURE********************************//
 router.post("/non-feature-entry", NfaNonFeatureController.Entry);
 router.post("/non-feature-final-submit", NfaNonFeatureController.finalSubmit);
-// router.get("/non-feature-entry-by/:id", NfaFeatureController.nonFeatureById);
+router.get("/non-feature-entry-by/:id", NfaNonFeatureController.nonFeatureById);
 
 //**********************BEAST BOOK CINEMA ENTRY***********************//
 router.post("/best-book-cinema-entry", BestBookCinemaController.Entry);
@@ -36,10 +36,11 @@ router.post(
   "/best-book-cinema-final-submit",
   BestBookCinemaController.finalSubmit
 );
-// router.get(
-//   "/best-book-cinema-entry-by/:id",
-//   BestBookCinemaController.bestBookById
-// );
+
+router.get(
+  "/best-book-cinema-entry-by/:id",
+  BestBookCinemaController.bestBookById
+);
 
 //*********************BEST FILM CRITIC*******************************
 router.post("/best-film-critic-entry", BestFilmCriticController.Entry);
@@ -48,10 +49,10 @@ router.post(
   BestFilmCriticController.finalSubmit
 );
 
-// router.get(
-//   "/best-film-critic-entry-by/:id",
-//   BestFilmCriticController.bestFilmCriticById
-// );
+router.get(
+  "/best-film-critic-entry-by/:id",
+  BestFilmCriticController.bestFilmCriticById
+);
 
 //**************************PRODUCER**********************************
 router.post("/store-producer", ProducerController.storeProducer);

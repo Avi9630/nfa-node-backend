@@ -1,6 +1,7 @@
 const BestBookCinemaLibrary = require("../libraries/BestBookCinemaLibrary");
 const CONSTANT = require("../libraries/Constant");
 const { DataTypes } = require("sequelize");
+const { Document } = require("./Document");
 const sequelize = require(".");
 
 const BestBookCinema = sequelize.define(
@@ -70,6 +71,12 @@ const BestBookCinema = sequelize.define(
     tableName: "best_book_cinemas",
   }
 );
+
+BestBookCinema.hasMany(Document, {
+  foreignKey: "context_id",
+  sourceKey: "id",
+  as: "documents",
+});
 
 const consumeRecords = async (payload) => {
   const methodMap = {

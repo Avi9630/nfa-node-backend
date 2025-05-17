@@ -1,4 +1,5 @@
 const { DataTypes } = require("sequelize");
+const { Document } = require("./Document");
 const sequelize = require(".");
 
 const Director = sequelize.define(
@@ -87,5 +88,11 @@ const Director = sequelize.define(
     tableName: "Directors",
   }
 );
+
+Director.hasMany(Document, {
+  foreignKey: "context_id",
+  sourceKey: "id",
+  as: "documents",
+});
 
 module.exports = { Director };
