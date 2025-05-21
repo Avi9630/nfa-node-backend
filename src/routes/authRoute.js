@@ -12,6 +12,7 @@ const SongController = require("../controllers/songController");
 const BookController = require("../controllers/bookController");
 
 const express = require("express");
+const PaymentController = require("../controllers/PaymentController");
 const router = express.Router();
 
 //**************************CLIENTS*******************************
@@ -112,4 +113,8 @@ router.get("/delete-editor/:id", EditorController.deleteEditor);
 
 //*****************************LANGUAGE*******************************//
 // router.get("/get-all-languages", CommonController.deleteEditor);
+
+//*****************************PAYMENT********************************//
+router.post("/generate-hash", PaymentController.generateHash);
+
 module.exports = router;
