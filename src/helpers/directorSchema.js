@@ -17,10 +17,43 @@ const DirectorSchema = {
         "Either NFA feature ID or NFA non-feature ID is required!";
     }
 
+    if (!trimmedData.name) {
+      errors.name = "Director name is required.!!";
+    }
+
+    if (!trimmedData.email) {
+      errors.email = "Email is required.!!";
+    } else if (!validator.isEmail(trimmedData.email)) {
+      errors.email = "Invalid email format.!!";
+    }
+
+    if (!trimmedData.contact_nom) {
+      errors.contact_nom = "Contact number is required.!!";
+    } else if (!validator.isMobilePhone(trimmedData.contact_nom, "en-IN")) {
+      errors.contact_nom =
+        "Contact number must be a valid 10-digit Indian number.!!";
+    }
+
+    if (!trimmedData.pincode || validator.isEmpty(trimmedData.pincode.trim())) {
+      errors.pincode = "Pincode is required.!";
+    } else if (!validator.matches(trimmedData.pincode, /^\d{6}$/)) {
+      errors.pincode = "Pincode must be 6 digits.!!";
+    }
+
+    if (!trimmedData.address) {
+      errors.address = "Address is required.!!";
+    }
+
     if (!trimmedData.indian_national) {
-      errors.indian_national = "Nationality is required!";
+      errors.indian_national = "Nationality is required.!!";
     } else if (!["0", "1"].includes(trimmedData.indian_national)) {
-      errors.indian_national = "Nationality must be 0 or 1!";
+      errors.indian_national = "Nationality must be 0 or 1.!!";
+    }
+
+    if (trimmedData.indian_national === "0") {
+      if (!trimmedData.country_of_nationality) {
+        errors.country_of_nationality = "Country of nationality is required.!!";
+      }
     }
 
     if (
@@ -29,40 +62,7 @@ const DirectorSchema = {
       !["1", 1].includes(trimmedData.receive_director_award)
     ) {
       errors.receive_director_award =
-        "Receive director award must be Yes(1) if provided.";
-    }
-
-    if (trimmedData.indian_national === "0") {
-      if (!trimmedData.country_of_nationality) {
-        errors.country_of_nationality = "Country of nationality is required!";
-      }
-    }
-
-    if (!trimmedData.name) {
-      errors.name = "Producer name is required!";
-    }
-
-    if (!trimmedData.email) {
-      errors.email = "Email is required!";
-    } else if (!validator.isEmail(trimmedData.email)) {
-      errors.email = "Invalid email format!";
-    }
-
-    if (!trimmedData.contact_nom) {
-      errors.contact_nom = "Contact number is required!";
-    } else if (!validator.isMobilePhone(trimmedData.contact_nom, "en-IN")) {
-      errors.contact_nom =
-        "Contact number must be a valid 10-digit Indian number!";
-    }
-
-    if (!trimmedData.pincode || validator.isEmpty(trimmedData.pincode.trim())) {
-      errors.pincode = "Pincode is required";
-    } else if (!validator.matches(trimmedData.pincode, /^\d{6}$/)) {
-      errors.pincode = "Pincode must be 6 digits";
-    }
-
-    if (!trimmedData.address) {
-      errors.address = "Address is required!";
+        "Receive director award must be Yes(1) if provided.!!";
     }
 
     const directorDoc = files?.find(
@@ -71,10 +71,10 @@ const DirectorSchema = {
 
     if (!directorDoc) {
       errors.director_self_attested_doc =
-        "Producer self-attested document is required!";
+        "Producer self-attested document is required.!!";
     } else if (!directorDoc.mimetype.startsWith("application/")) {
       errors.director_self_attested_doc =
-        "Invalid file format for producer self-attested document!";
+        "Invalid file format for producer self-attested document.!!";
     }
 
     return {

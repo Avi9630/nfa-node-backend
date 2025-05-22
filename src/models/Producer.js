@@ -63,10 +63,10 @@ const Producer = sequelize.define(
       allowNull: false,
     },
 
-    producer_self_attested_doc: {
-      type: DataTypes.STRING(),
-      allowNull: false,
-    },
+    // producer_self_attested_doc: {
+    //   type: DataTypes.STRING(),
+    //   allowNull: false,
+    // },
 
     country_of_nationality: {
       type: DataTypes.STRING,

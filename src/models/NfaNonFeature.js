@@ -3,7 +3,6 @@ const CONSTANT = require("../libraries/Constant");
 const { Document } = require("./Document");
 const { DataTypes } = require("sequelize");
 const sequelize = require(".");
-const Joi = require("joi");
 
 const NfaNonFeature = sequelize.define(
   "NfaNonFeature",
@@ -17,7 +16,7 @@ const NfaNonFeature = sequelize.define(
     step: { type: DataTypes.INTEGER, allowNull: true },
     active_step: { type: DataTypes.TINYINT, allowNull: true },
     payment_status: { type: DataTypes.TINYINT, allowNull: true },
-    // status: { type: DataTypes.TINYINT, allowNull: false, defaultValue: true },
+    status: { type: DataTypes.TINYINT, allowNull: false, defaultValue: true },
     client_id: {
       type: DataTypes.TINYINT,
       allowNull: false,
@@ -90,18 +89,18 @@ const NfaNonFeature = sequelize.define(
       type: DataTypes.DATE,
       allowNull: true,
     },
-    censor_certificate_file: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
+    // censor_certificate_file: {
+    //   type: DataTypes.STRING,
+    //   allowNull: true,
+    // },
     company_reg_details: {
       type: DataTypes.STRING,
       allowNull: true,
     },
-    company_reg_doc: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
+    // company_reg_doc: {
+    //   type: DataTypes.STRING,
+    //   allowNull: true,
+    // },
     title_registratin_detils: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -126,10 +125,10 @@ const NfaNonFeature = sequelize.define(
       type: DataTypes.TINYINT,
       allowNull: true,
     },
-    original_work_copy: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
+    // original_work_copy: {
+    //   type: DataTypes.STRING,
+    //   allowNull: true,
+    // },
     dialogue: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -238,6 +237,22 @@ const NfaNonFeature = sequelize.define(
       type: DataTypes.TINYINT,
       allowNull: true,
     },
+    declaration_nine: {
+      type: DataTypes.TINYINT,
+      allowNull: true,
+    },
+    declaration_ten: {
+      type: DataTypes.TINYINT,
+      allowNull: true,
+    },
+    declaration_eleven: {
+      type: DataTypes.TINYINT,
+      allowNull: true,
+    },
+    declaration_twelve: {
+      type: DataTypes.TINYINT,
+      allowNull: true,
+    },
 
     created_at: { type: DataTypes.TIME },
     updated_at: { type: DataTypes.TIME },
@@ -259,45 +274,6 @@ NfaNonFeature.hasMany(Document, {
   as: "documents",
 });
 
-const validateData = async (payload) => {
-  const messages = {};
-
-  let schema = Joi.object({
-    step: Joi.number().required(),
-    // user: Joi.any(),
-  });
-
-  if (payload.step !== CONSTANT.stepsFeature().GENRAL) {
-    schema = schema.append({
-      last_id: Joi.required(),
-    });
-  }
-
-  const methodMap = {
-    [CONSTANT.stepsFeature().GENRAL]: "GENRAL",
-    [CONSTANT.stepsFeature().CENSOR]: "CENSOR",
-    [CONSTANT.stepsFeature().COMPANY_REGISTRATION]: "COMPANYREGISTRATION",
-    [CONSTANT.stepsFeature().PRODUCER]: "PRODUCER",
-    [CONSTANT.stepsFeature().DIRECTOR]: "DIRECTOR",
-    [CONSTANT.stepsFeature().ACTORS]: "ACTORS",
-    [CONSTANT.stepsFeature().SONGS]: "SONGS",
-    [CONSTANT.stepsFeature().AUDIOGRAPHER]: "AUDIOGRAPHER",
-    [CONSTANT.stepsFeature().OTHER]: "OTHER",
-    [CONSTANT.stepsFeature().RETURN_ADDRESS]: "RETURNADDRESS",
-    [CONSTANT.stepsFeature().DECLARATION]: "DECLARATION",
-  };
-
-  if (methodMap[payload.step]) {
-    const result = LibrariesNFAFeature[methodMap[payload.step]](payload);
-    schema = schema.append(result.validatorSchema);
-    return {
-      validatorSchema: schema,
-      messagesArray: result.messagesArray,
-    };
-  }
-  return { validatorSchema: schema, messagesArray: messages };
-};
-
 const consumeRecords = async (payload) => {
   const methodMap = {
     [CONSTANT.stepsNonFeature().GENRAL]: "consumeGENERAL",
@@ -306,9 +282,6 @@ const consumeRecords = async (payload) => {
       "consumeCOMPANYREGISTRATION",
     [CONSTANT.stepsNonFeature().PRODUCER]: "consumePRODUCER",
     [CONSTANT.stepsNonFeature().DIRECTOR]: "consumeDIRECTOR",
-    // [CONSTANT.stepsNonFeature().ACTORS]: "consumeACTORS",
-    // [CONSTANT.stepsNonFeature().SONGS]: "consumeSONGS",
-    // [CONSTANT.stepsNonFeature().AUDIOGRAPHER]: "consumeAUDIOGRAPHER",
     [CONSTANT.stepsNonFeature().OTHER]: "consumeOTHER",
     [CONSTANT.stepsNonFeature().RETURN_ADDRESS]: "consumeRETURNADDRESS",
     [CONSTANT.stepsNonFeature().DECLARATION]: "consumeDECLARATION",
@@ -320,20 +293,5 @@ const consumeRecords = async (payload) => {
   return {};
 };
 
-const createNonFeature = async (data) => {
-  try {
-    const created = await NfaNonFeature.create(data);
-    if (!created) {
-      throw new Error("Non Feature creation failed. Please try again.");
-    }
-    return created;
-  } catch (error) {
-    console.error("Non Feature creation error:", error);
-    throw new Error("An error occurred while creating the non-feature form .");
-  }
-};
-
-NfaNonFeature.validateData = validateData;
 NfaNonFeature.consumeRecords = consumeRecords;
-NfaNonFeature.createNonFeature = createNonFeature;
 module.exports = { NfaNonFeature };

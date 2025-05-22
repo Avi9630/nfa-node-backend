@@ -17,17 +17,6 @@ const ProducerSchema = {
         "Either NFA feature ID or NFA non-feature ID is required!";
     }
 
-    if (!trimmedData.indian_national) {
-      errors.indian_national = "Nationality is required!";
-    } else if (!["0", "1"].includes(trimmedData.indian_national)) {
-      errors.indian_national = "Nationality must be 0 or 1!";
-    }
-
-    if (!["0", "1", 0, 1].includes(trimmedData.receive_producer_award)) {
-      errors.receive_producer_award =
-        "Receive producer award must be 0 OR 1 if provided.!!";
-    }
-
     if (trimmedData.indian_national === "0") {
       if (!trimmedData.country_of_nationality) {
         errors.country_of_nationality = "Country of nationality is required!";
@@ -59,6 +48,17 @@ const ProducerSchema = {
 
     if (!trimmedData.address) {
       errors.address = "Address is required!";
+    }
+
+    if (!trimmedData.indian_national) {
+      errors.indian_national = "Nationality is required!";
+    } else if (!["0", "1"].includes(trimmedData.indian_national)) {
+      errors.indian_national = "Nationality must be 0 or 1!";
+    }
+
+    if (!["0", "1", 0, 1].includes(trimmedData.receive_producer_award)) {
+      errors.receive_producer_award =
+        "Receive producer award must be 0 OR 1 if provided.!!";
     }
 
     const producerDoc = files?.find(

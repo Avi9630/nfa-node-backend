@@ -5,19 +5,15 @@ const Auth = require("../middleware/auth");
 const express = require("express");
 const router = express.Router();
 
-// LOGIN - REGISTER
+//****************LOGIN-REGISTER-VERIFY-ACCOUNT-VERIFY-EMAIL && RESET-PASSWORD*************************//
+router.post("/change-Password", ClientController.changePassword);
+router.get("/verify/:token", ClientController.activateAccount);
+router.post("/reset-Password", ClientController.resetPassword);
 router.get("/get-user-type", CommonController.getUserType);
+router.post("/verify-email", ClientController.verifyEmail);
+router.post("/verify-otp", ClientController.verifyOtp);
 router.post("/register", ClientController.register);
 router.post("/login", ClientController.login);
-
-//ACTIVATE-ACCOUNT
-router.get("/verify/:token", ClientController.activateAccount);
-
-//VERIFY-EMAIL && RESET-PASSWORD
-router.post("/verify-email", ClientController.verifyEmail);
-router.post("/reset-Password", ClientController.resetPassword);
-router.post("/verify-otp", ClientController.verifyOtp);
-router.post("/change-Password", ClientController.changePassword);
 
 //CLIENTS
 // router.get("/get-client-details", Auth, ClientController.getClientDetails);

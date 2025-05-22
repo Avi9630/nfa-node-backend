@@ -57,7 +57,7 @@ const ProducerController = {
         email: payload.email,
         address: payload.address,
         pincode: payload.pincode,
-        producer_self_attested_doc: censorFile.originalname,
+        // producer_self_attested_doc: censorFile.originalname,
         country_of_nationality: payload.country_of_nationality ?? null,
         production_company: payload.production_company ?? null,
       };
@@ -173,9 +173,9 @@ const ProducerController = {
         address: payload.address ?? producer.address,
         pincode: payload.pincode ?? producer.pincode,
         indian_national: payload.indian_national ?? producer.indian_national,
-        producer_self_attested_doc:
-          payload.producer_self_attested_doc ??
-          producer.producer_self_attested_doc,
+        // producer_self_attested_doc:
+        //   payload.producer_self_attested_doc ??
+        //   producer.producer_self_attested_doc,
         production_company:
           payload.production_company ?? producer.production_company,
       };
@@ -246,16 +246,30 @@ const ProducerController = {
         const checkFeature = await NfaFeature.findOne({
           where: { id: payload.nfa_feature_id, client_id: payload.user.id },
         });
+
         if (!checkFeature) {
           responseHelper(res, "noresult", {
             message: "Please provide valid details.!!",
           });
         }
+
         allProducer = await Producer.findAll({
           where: {
             nfa_feature_id: payload.nfa_feature_id,
             client_id: payload.user.id,
           },
+          include: [
+            {
+              model: Document,
+              as: "documents",
+              where: {
+                form_type: 1,
+                website_type: 5,
+                document_type: 4,
+              },
+              required: false,
+            },
+          ],
         });
       }
 
@@ -263,18 +277,33 @@ const ProducerController = {
         const checkNonFeature = await NfaNonFeature.findOne({
           where: { id: payload.nfa_non_feature_id, client_id: payload.user.id },
         });
+
         if (!checkNonFeature) {
           responseHelper(res, "noresult", {
             message: "Please provide valid details.!!",
           });
         }
+
         allProducer = await Producer.findAll({
           where: {
             nfa_non_feature_id: payload.nfa_non_feature_id,
             client_id: payload.user.id,
           },
+          include: [
+            {
+              model: Document,
+              as: "documents",
+              where: {
+                form_type: 2,
+                website_type: 5,
+                document_type: 4,
+              },
+              required: false,
+            },
+          ],
         });
       }
+
       responseHelper(res, "success", { data: allProducer });
     } catch (error) {
       responseHelper(res, "exception", { message: error });

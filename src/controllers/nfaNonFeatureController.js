@@ -139,10 +139,10 @@ const nfaNonFeatureController = {
       };
     }
     data.active_step = payload.step;
-    create = await NfaNonFeature.createNonFeature(data);
+    create = await NfaNonFeature.create(data);
     return {
       status: "created",
-      data: { message: "Feature form created.!!", record: create },
+      data: { message: "Non-feature created successfully.!!", record: create },
     };
   },
 
@@ -313,90 +313,6 @@ const nfaNonFeatureController = {
       data: update,
     };
   },
-
-  // handleActorsStep: async (data, payload, user) => {
-  //   const lastId = payload.last_id;
-
-  //   const checkForm = await NfaFeature.findOne({
-  //     where: { client_id: payload.user.id, id: lastId },
-  //   });
-
-  //   if (!checkForm) {
-  //     return {
-  //       status: "updateError",
-  //       message: "Please provide valid details to update.!!",
-  //     };
-  //   }
-
-  //   if (
-  //     !checkForm.active_step ||
-  //     checkForm.active_step < CONSTANT.stepsFeature().PRODUCER
-  //   ) {
-  //     data.active_step = CONSTANT.stepsFeature().PRODUCER;
-  //   }
-  //   update = await checkForm.update(data);
-  //   return {
-  //     status: "success",
-  //     message: "Records updated successfully.!!",
-  //     data: update,
-  //   };
-  // },
-
-  // handleSongsStep: async (data, payload, user) => {
-  //   const lastId = payload.last_id;
-
-  //   const checkForm = await NfaFeature.findOne({
-  //     where: { client_id: payload.user.id, id: lastId },
-  //   });
-
-  //   if (!checkForm) {
-  //     return {
-  //       status: "updateError",
-  //       message: "Please provide valid details to update.!!",
-  //     };
-  //   }
-
-  //   if (
-  //     !checkForm.active_step ||
-  //     checkForm.active_step < CONSTANT.stepsFeature().PRODUCER
-  //   ) {
-  //     data.active_step = CONSTANT.stepsFeature().PRODUCER;
-  //   }
-  //   update = await checkForm.update(data);
-  //   return {
-  //     status: "success",
-  //     message: "Records updated successfully.!!",
-  //     data: update,
-  //   };
-  // },
-
-  // handleAudiographerStep: async (data, payload, user) => {
-  //   const lastId = payload.last_id;
-
-  //   const checkForm = await NfaFeature.findOne({
-  //     where: { client_id: payload.user.id, id: lastId },
-  //   });
-
-  //   if (!checkForm) {
-  //     return {
-  //       status: "updateError",
-  //       message: "Please provide valid details to update.!!",
-  //     };
-  //   }
-
-  //   if (
-  //     !checkForm.active_step ||
-  //     checkForm.active_step < CONSTANT.stepsFeature().PRODUCER
-  //   ) {
-  //     data.active_step = CONSTANT.stepsFeature().PRODUCER;
-  //   }
-  //   update = await checkForm.update(data);
-  //   return {
-  //     status: "success",
-  //     message: "Records updated successfully.!!",
-  //     data: update,
-  //   };
-  // },
 
   handleOtherStep: async (data, payload, user) => {
     const lastId = payload.last_id;

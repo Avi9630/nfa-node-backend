@@ -15,23 +15,23 @@ const express = require("express");
 const PaymentController = require("../controllers/PaymentController");
 const router = express.Router();
 
-//**************************CLIENTS*******************************
+//**************************CLIENTS*******************************//
 router.get("/get-client-details", ClientController.getClientDetails);
 router.get("/delete-entry/:id", ClientController.entryDelete);
 router.get("/entry-list", ClientController.entryList);
 router.post("/logout", ClientController.logout);
 
-//************************FEATURE********************//
+//************************FEATURE**********************************//
 router.post("/feature-entry", NfaFeatureController.Entry);
 router.post("/feature-final-submit", NfaFeatureController.finalSubmit);
 router.get("/feature-entry-by/:id", NfaFeatureController.featureById);
 
-//************************NON-FEATURE********************************//
+//************************NON-FEATURE******************************//
 router.post("/non-feature-entry", NfaNonFeatureController.Entry);
 router.post("/non-feature-final-submit", NfaNonFeatureController.finalSubmit);
 router.get("/non-feature-entry-by/:id", NfaNonFeatureController.nonFeatureById);
 
-//**********************BEAST BOOK CINEMA ENTRY***********************//
+//**********************BEAST BOOK CINEMA ENTRY********************//
 router.post("/best-book-cinema-entry", BestBookCinemaController.Entry);
 router.post(
   "/best-book-cinema-final-submit",
@@ -43,7 +43,7 @@ router.get(
   BestBookCinemaController.bestBookById
 );
 
-//*********************BEST FILM CRITIC*******************************
+//*********************BEST FILM CRITIC****************************//
 router.post("/best-film-critic-entry", BestFilmCriticController.Entry);
 router.post(
   "/best-film-critic-final-submit",
@@ -55,14 +55,14 @@ router.get(
   BestFilmCriticController.bestFilmCriticById
 );
 
-//**************************PRODUCER**********************************
+//**************************PRODUCER*******************************//
 router.post("/store-producer", ProducerController.storeProducer);
 router.post("/update-producer", ProducerController.updateProducer);
 router.post("/list-producer", ProducerController.listProducer);
 router.get("/get-producer-by/:id", ProducerController.getProducer);
 router.get("/delete-producer/:id", ProducerController.deleteProducer);
 
-//**************************DIRECTOR**********************************
+//**************************DIRECTOR*******************************//
 router.post("/store-director", DirectorController.storeDirector);
 router.post("/update-director", DirectorController.updateDirector);
 router.post("/list-director", DirectorController.listDirector);
@@ -104,17 +104,17 @@ router.post("/list-book", BookController.listBook);
 router.get("/get-book-by/:id", BookController.getBook);
 router.get("/delete-book/:id", BookController.deleteBook);
 
-// ****************************EDITORS********************************//
+// ****************************EDITORS****************************//
 router.post("/store-editor", EditorController.storeEditor);
 router.post("/update-editor", EditorController.updateEditor);
 router.post("/list-editor", EditorController.listEditor);
 router.get("/get-editor-by/:id", EditorController.getEditor);
 router.get("/delete-editor/:id", EditorController.deleteEditor);
 
-//*****************************LANGUAGE*******************************//
+//*****************************LANGUAGE***************************//
 // router.get("/get-all-languages", CommonController.deleteEditor);
 
-//*****************************PAYMENT********************************//
+//*****************************PAYMENT*****************************//
 router.post("/generate-hash", PaymentController.generateHash);
 
 module.exports = router;

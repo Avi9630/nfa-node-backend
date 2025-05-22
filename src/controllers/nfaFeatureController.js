@@ -13,8 +13,6 @@ const CONSTANT = require("../libraries/Constant");
 const { Client } = require("../models/Client");
 const { Op } = require("sequelize");
 
-// const Mail = require("../mailer/Mail");
-
 const nfaFeatureController = {
   Entry: async (req, res) => {
     const files = req.files;
@@ -145,7 +143,6 @@ const nfaFeatureController = {
       }
 
       update = await checkForm.update(data);
-
       return {
         status: "success",
         message: "Records updated successfully.!!",
@@ -154,10 +151,11 @@ const nfaFeatureController = {
     }
 
     data.active_step = payload.step;
-    create = await NfaFeature.createFeature(data);
+    create = await NfaFeature.create(data);
+
     return {
       status: "created",
-      data: { message: "Feature form created.!!", record: create },
+      data: { message: "Created successfully.!!", record: create },
     };
   },
 

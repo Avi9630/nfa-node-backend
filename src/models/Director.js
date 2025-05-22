@@ -63,10 +63,10 @@ const Director = sequelize.define(
       allowNull: false,
     },
 
-    director_self_attested_doc: {
-      type: DataTypes.STRING(),
-      allowNull: false,
-    },
+    // director_self_attested_doc: {
+    //   type: DataTypes.STRING(),
+    //   allowNull: false,
+    // },
 
     country_of_nationality: {
       type: DataTypes.STRING,

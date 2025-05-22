@@ -270,6 +270,18 @@ const NfaNonFeatureHelper = {
       if (!["1", 1].includes(payload.declaration_eight)) {
         errors.declaration_eight = "Declaration is must be Yes(1).!!";
       }
+      if (!["1", 1].includes(payload.declaration_nine)) {
+        errors.declaration_nine = "Declaration is must be Yes(1).!!";
+      }
+      if (!["1", 1].includes(payload.declaration_ten)) {
+        errors.declaration_ten = "Declaration is must be Yes(1).!!";
+      }
+      if (!["1", 1].includes(payload.declaration_eleven)) {
+        errors.declaration_eleven = "Declaration is must be Yes(1).!!";
+      }
+      if (!["1", 1].includes(payload.declaration_twelve)) {
+        errors.declaration_twelve = "Declaration is must be Yes(1).!!";
+      }
     }
 
     return {

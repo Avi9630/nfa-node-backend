@@ -5,82 +5,100 @@ const ClientSchema = {
   validateInput: (data) => {
     const errors = {};
 
+    const trimmedData = Object.keys(data).reduce((acc, key) => {
+      acc[key] = typeof data[key] === "string" ? data[key].trim() : data[key];
+      return acc;
+    }, {});
+
     // First Name
-    if (!data.first_name || validator.isEmpty(data.first_name.trim())) {
-      errors.first_name = "First name is required";
+    if (
+      !trimmedData.first_name ||
+      validator.isEmpty(trimmedData.first_name.trim())
+    ) {
+      errors.first_name = "First name is required.!!";
     }
 
     //Last Name
-    if (!data.last_name || validator.isEmpty(data.last_name.trim())) {
-      errors.first_name = "Last name is required";
+    if (
+      !trimmedData.last_name ||
+      validator.isEmpty(trimmedData.last_name.trim())
+    ) {
+      errors.last_name = "Last name is required.!!";
     }
 
-    // EMAIL
-    if (!data.email || validator.isEmpty(String(data.email).trim())) {
+    // Email
+    if (
+      !trimmedData.email ||
+      validator.isEmpty(String(trimmedData.email).trim())
+    ) {
       errors.email = "Email is required.!!";
-    } else if (!validator.isEmail(String(data.email).trim())) {
-      errors.email = "Invalid email format";
+    } else if (!validator.isEmail(String(trimmedData.email).trim())) {
+      errors.email = "Invalid email format.!!";
     }
-
-    // // Email
-    // if (!data.email || validator.isEmpty(String(data.email).trim())) {
-    //   errors.email = "Email is required";
-    // } else if (!validator.isEmail(String(data.email).trim())) {
-    //   errors.email = "Invalid email format";
-    // }
 
     // Mobile
-    if (!data.mobile || validator.isEmpty(data.mobile.trim())) {
-      errors.mobile = "Mobile is required";
-    } else if (!validator.isMobilePhone(data.mobile, "en-IN")) {
-      errors.mobile = "Mobile must be a valid 10-digit Indian number";
+    if (!trimmedData.mobile || validator.isEmpty(trimmedData.mobile.trim())) {
+      errors.mobile = "Mobile is required.!!";
+    } else if (!validator.isMobilePhone(trimmedData.mobile, "en-IN")) {
+      errors.mobile = "Mobile must be a valid 10-digit Indian number.!!";
     }
 
     // Pincode
-    if (!data.pincode || validator.isEmpty(data.pincode.trim())) {
-      errors.pincode = "Pincode is required";
-    } else if (!validator.matches(data.pincode, /^\d{6}$/)) {
-      errors.pincode = "Pincode must be 6 digits";
+    if (!trimmedData.pincode || validator.isEmpty(trimmedData.pincode.trim())) {
+      errors.pincode = "Pincode is required.!!";
+    } else if (!validator.matches(trimmedData.pincode, /^\d{6}$/)) {
+      errors.pincode = "Pincode must be 6 digits.!!";
     }
 
     // Aadhar Number
-    if (!data.aadhar_number || validator.isEmpty(data.aadhar_number.trim())) {
-      errors.aadhar_number = "Aadhar number is required";
-    } else if (!validator.matches(data.aadhar_number, /^\d{12}$/)) {
-      errors.aadhar_number = "Aadhar must be 12 digits";
+    if (
+      !trimmedData.aadhar_number ||
+      validator.isEmpty(trimmedData.aadhar_number.trim())
+    ) {
+      errors.aadhar_number = "Aadhar number is required.!!";
+    } else if (!validator.matches(trimmedData.aadhar_number, /^\d{12}$/)) {
+      errors.aadhar_number = "Aadhar must be 12 digits.!!";
     }
 
     // Address
-    if (!data.address || validator.isEmpty(data.address.trim())) {
-      errors.address = "Address is required";
+    if (!trimmedData.address || validator.isEmpty(trimmedData.address.trim())) {
+      errors.address = "Address is required.!!";
     }
 
     // Usertype (1 or 2 only)
-    if (!data.usertype || !["1", "2"].includes(String(data.usertype))) {
-      errors.usertype = "Usertype must be either 1 or 2";
+    if (
+      !trimmedData.usertype ||
+      !["1", "2"].includes(String(trimmedData.usertype))
+    ) {
+      errors.usertype = "Usertype must be either 1 or 2.!!";
     }
 
     // Captcha
-    if (!data.captcha || validator.isEmpty(data.captcha.trim())) {
-      errors.captcha = "Captcha is required";
+    if (!trimmedData.captcha || validator.isEmpty(trimmedData.captcha.trim())) {
+      errors.captcha = "Captcha is required.!!";
     }
 
     // Password
-    if (!data.password || validator.isEmpty(String(data.password).trim())) {
-      errors.password = "Password is required";
-    } else if (!validator.isLength(data.password.trim(), { min: 6 })) {
-      errors.password = "Password must be at least 6 characters";
+    if (
+      !trimmedData.password ||
+      validator.isEmpty(String(trimmedData.password).trim())
+    ) {
+      errors.password = "Password is required.!!";
+    } else if (!validator.isLength(trimmedData.password.trim(), { min: 6 })) {
+      errors.password = "Password must be at least 6 characters.!!";
     }
 
     // Confirm password
     if (
-      !data.password_confirmation ||
-      validator.isEmpty(data.password_confirmation.trim())
+      !trimmedData.password_confirmation ||
+      validator.isEmpty(trimmedData.password_confirmation.trim())
     ) {
-      errors.password_confirmation = "Password confirmation is required";
-    } else if (data.password.trim() !== data.password_confirmation.trim()) {
+      errors.password_confirmation = "Password confirmation is required.!!";
+    } else if (
+      trimmedData.password.trim() !== trimmedData.password_confirmation.trim()
+    ) {
       errors.password_confirmation =
-        "Password confirmation must match password";
+        "Password confirmation must match password.!!";
     }
 
     return {

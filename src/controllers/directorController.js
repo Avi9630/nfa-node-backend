@@ -5,6 +5,7 @@ const DirectorSchema = require("../helpers/directorSchema");
 const { NfaFeature } = require("../models/NfaFeature");
 const { Director } = require("../models/Director");
 const ImageLib = require("../libraries/ImageLib");
+const { Document } = require("../models/Document");
 
 const DirectorController = {
   storeDirector: async (req, res) => {
@@ -43,9 +44,9 @@ const DirectorController = {
         }
       }
 
-      const directorFile = payload.files.find(
-        (file) => file.fieldname === "director_self_attested_doc"
-      );
+      // const directorFile = payload.files.find(
+      //   (file) => file.fieldname === "director_self_attested_doc"
+      // );
 
       arrayToInsert = {
         client_id: payload.user.id,
@@ -58,9 +59,9 @@ const DirectorController = {
         email: payload.email,
         address: payload.address,
         pincode: payload.pincode,
-        director_self_attested_doc: directorFile.originalname,
+        // director_self_attested_doc: directorFile.originalname,
         country_of_nationality: payload.country_of_nationality ?? null,
-        production_company: payload.production_company ?? null,
+        // production_company: payload.production_company ?? null,
       };
 
       director = await Director.create(arrayToInsert);
@@ -106,6 +107,7 @@ const DirectorController = {
       }
       return responseHelper(res, "created", {
         message: "Director created successfully.!!",
+        data: director,
       });
     } catch (error) {
       return responseHelper(res, "exception", { message: error.message });
@@ -173,11 +175,11 @@ const DirectorController = {
         pincode: payload.pincode ?? director.pincode,
         country_of_nationality:
           payload.country_of_nationality ?? director.country_of_nationality,
-        director_self_attested_doc:
-          payload.director_self_attested_doc ??
-          director.director_self_attested_doc,
-        production_company:
-          payload.production_company ?? director.production_company,
+        // director_self_attested_doc:
+        //   payload.director_self_attested_doc ??
+        //   director.director_self_attested_doc,
+        // production_company:
+        //   payload.production_company ?? director.production_company,
       };
 
       if (Array.isArray(payload.files)) {
@@ -232,16 +234,30 @@ const DirectorController = {
         const checkFeature = await NfaFeature.findOne({
           where: { id: payload.nfa_feature_id, client_id: payload.user.id },
         });
+
         if (!checkFeature) {
           responseHelper(res, "noresult", {
             message: "Please provide valid details.!!",
           });
         }
+
         allDirector = await Director.findAll({
           where: {
             nfa_feature_id: payload.nfa_feature_id,
             client_id: payload.user.id,
           },
+          include: [
+            {
+              model: Document,
+              as: "documents",
+              where: {
+                form_type: 1,
+                website_type: 5,
+                document_type: 5,
+              },
+              required: false,
+            },
+          ],
         });
       }
 
@@ -259,6 +275,18 @@ const DirectorController = {
             nfa_non_feature_id: payload.nfa_non_feature_id,
             client_id: payload.user.id,
           },
+          include: [
+            {
+              model: Document,
+              as: "documents",
+              where: {
+                form_type: 2,
+                website_type: 5,
+                document_type: 5,
+              },
+              required: false,
+            },
+          ],
         });
       }
       responseHelper(res, "success", { data: allDirector });

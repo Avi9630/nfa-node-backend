@@ -24,26 +24,26 @@ const NfaNonFeatureLibrary = {
   },
 
   consumeCENSOR: (payload) => {
-    const censorFile = payload.files?.find(
-      (file) => file.fieldname === "censor_certificate_file"
-    );
+    // const censorFile = payload.files?.find(
+    //   (file) => file.fieldname === "censor_certificate_file"
+    // );
     const consumeCensor = {
       last_id: payload.last_id,
       censor_certificate_nom: payload.censor_certificate_nom || null,
       censor_certificate_date: payload.censor_certificate_date || null,
-      censor_certificate_file: censorFile,
+      // censor_certificate_file: censorFile,
     };
     return consumeCensor;
   },
 
   consumeCOMPANYREGISTRATION: (payload) => {
-    const censorFile = payload.files?.find(
-      (file) => file.fieldname === "company_reg_doc"
-    );
+    // const censorFile = payload.files?.find(
+    //   (file) => file.fieldname === "company_reg_doc"
+    // );
     const consumeCensor = {
       last_id: payload.last_id,
       company_reg_details: payload.company_reg_details || null,
-      company_reg_doc: censorFile,
+      // company_reg_doc: censorFile,
       title_registratin_detils: payload.title_registratin_detils || null,
     };
     return consumeCensor;
@@ -70,16 +70,16 @@ const NfaNonFeatureLibrary = {
   },
 
   consumeOTHER: (payload) => {
-    const originalWorkCopyFile = payload.files?.find(
-      (file) => file.fieldname === "original_work_copy"
-    );
+    // const originalWorkCopyFile = payload.files?.find(
+    //   (file) => file.fieldname === "original_work_copy"
+    // );
     const consumeOTHER = {
       last_id: payload.last_id,
       original_screenplay_name: payload.original_screenplay_name || null,
       adapted_screenplay_name: payload.adapted_screenplay_name || null,
       story_writer_name: payload.story_writer_name || null,
       work_under_public_domain: payload.work_under_public_domain || null,
-      original_work_copy: originalWorkCopyFile,
+      // original_work_copy: originalWorkCopyFile,
       dialogue: payload.dialogue || null,
       cinemetographer: payload.cinemetographer || null,
       editor: payload.editor || null,
@@ -97,7 +97,7 @@ const NfaNonFeatureLibrary = {
   },
 
   consumeRETURNADDRESS: (payload) => {
-    const consumeOTHER = {
+    const consumeRETURNADDRESS = {
       last_id: payload.last_id,
       return_name: payload.return_name || null,
       return_email: payload.return_email || null,
@@ -107,11 +107,11 @@ const NfaNonFeatureLibrary = {
       return_fax: payload.return_fax || null,
       return_website: payload.return_website || null,
     };
-    return consumeOTHER;
+    return consumeRETURNADDRESS;
   },
 
   consumeDECLARATION: (payload) => {
-    const consumeOTHER = {
+    const consumeDECLARATION = {
       last_id: payload.last_id,
       declaration_one: payload.declaration_one || null,
       declaration_two: payload.declaration_two || null,
@@ -121,8 +121,12 @@ const NfaNonFeatureLibrary = {
       declaration_six: payload.declaration_six || null,
       declaration_seven: payload.declaration_seven || null,
       declaration_eight: payload.declaration_eight || null,
+      declaration_nine: payload.declaration_nine || null,
+      declaration_ten: payload.declaration_ten || null,
+      declaration_eleven: payload.declaration_eleven || null,
+      declaration_twelve: payload.declaration_twelve || null,
     };
-    return consumeOTHER;
+    return consumeDECLARATION;
   },
 };
 

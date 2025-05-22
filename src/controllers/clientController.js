@@ -10,26 +10,6 @@ const bcrypt = require("bcryptjs");
 const moment = require("moment");
 
 const ClientController = {
-  verifyEmail: async (req, res) => {
-    const { isValid, errors } = ClientSchema.validateVerifyEmailInput(req.body);
-    if (!isValid) {
-      return responseHelper(res, "validatorerrors", { errors });
-    }
-    try {
-      const client = await Client.findOne({ where: { email: req.body.email } });
-      if (!client) {
-        responseHelper(res, "exception", {
-          message: "No account found with this email address.!!",
-        });
-      }
-      return responseHelper(res, "success", {
-        message: "Email verified successfully.!!",
-      });
-    } catch (error) {
-      return responseHelper(res, "exception", { message: error.message });
-    }
-  },
-
   register: async (req, res) => {
     const { isValid, errors } = ClientSchema.validateInput(req.body);
 
@@ -45,19 +25,24 @@ const ClientController = {
     }
 
     try {
-      const hashedPassword = await bcrypt.hash(req.body.password, 10);
-      const username = await Client.generateUsername(req.body.usertype);
+      const payload = {
+        ...req.body,
+      };
+
+      const hashedPassword = await bcrypt.hash(payload.password, 10);
+      const username = await Client.generateUsername(payload.usertype);
+
       const newClient = {
-        first_name: req.body.first_name,
-        last_name: req.body.last_name,
-        email: req.body.email,
-        mobile: req.body.mobile,
-        pincode: req.body.pincode,
-        aadhar_number: req.body.aadhar_number,
-        landline: req.body.landline ?? null,
-        address: req.body.address ?? null,
-        usertype: req.body.usertype,
-        captcha: req.body.captcha,
+        first_name: payload.first_name,
+        last_name: payload.last_name,
+        email: payload.email,
+        mobile: payload.mobile,
+        pincode: payload.pincode,
+        aadhar_number: payload.aadhar_number,
+        landline: payload.landline ?? null,
+        address: payload.address ?? null,
+        usertype: payload.usertype,
+        captcha: payload.captcha,
         username: username,
         active: 0,
         activate_token: await Constant.generateToken(100),
@@ -113,6 +98,36 @@ const ClientController = {
       return responseHelper(res, "success", {
         message: "Account has been activated successfully.!!",
       });
+    } catch (error) {
+      return responseHelper(res, "exception", { message: error.message });
+    }
+  },
+
+  verifyEmail: async (req, res) => {
+    const { isValid, errors } = ClientSchema.validateVerifyEmailInput(req.body);
+    if (!isValid) {
+      return responseHelper(res, "validatorerrors", { errors });
+    }
+    try {
+      const client = await Client.findOne({ where: { email: req.body.email } });
+
+      if (client) {
+        console.log(typeof client.active);
+        if (client.active) {
+          return responseHelper(res, "success", {
+            message: "Email verified successfully.!!",
+            data: 1,
+          });
+        }
+        return responseHelper(res, "incorrectinfo", {
+          message: "Account not activated.!!",
+          data: 1,
+        });
+      } else {
+        responseHelper(res, "exception", {
+          message: "No account found with this email address.!!",
+        });
+      }
     } catch (error) {
       return responseHelper(res, "exception", { message: error.message });
     }
