@@ -11,27 +11,17 @@ const moment = require("moment");
 
 const ClientController = {
   register: async (req, res) => {
-    if (!req.body || Object.keys(req.body).length === 0) {
-      return responseHelper(res, "validatorerrors", {
-        message: "Validation error.!!",
-        errors: ["Request body is required"],
-      });
+    const { isValid, errors } = ClientSchema.validateInput(req.body);
+
+    if (!isValid) {
+      return responseHelper(res, "validatorerrors", { errors });
     }
 
-    const { error } = ClientSchema.registerSchema(req.body);
-    if (error) {
-      return responseHelper(res, "validatorerrors", {
-        message: "Validation error.!!",
-        errors: error.details.map((err) => err.message),
-      });
-    }
+    const { isValid: isDuplicate, errors: duplicateErrors } =
+      await ClientSchema.checkDuplicateClient(req.body);
 
-    const { isDuplicate, errors } = await Client.checkDuplicateClient(req.body);
     if (!isDuplicate) {
-      return responseHelper(res, "validatorerrors", {
-        message: "Duplicate data found!",
-        errors,
-      });
+      return responseHelper(res, "validatorerrors", { duplicateErrors });
     }
 
     try {
@@ -82,54 +72,6 @@ const ClientController = {
     }
   },
 
-  login: async (req, res) => {
-    if (!req.body || Object.keys(req.body).length === 0) {
-      return responseHelper(res, "validatorerrors", {
-        message: "Validation error.!!",
-        errors: ["Request body is required"],
-      });
-    }
-
-    const { error } = ClientSchema.loginValidate(req.body);
-    if (error) {
-      return responseHelper(res, "validatorerrors", {
-        message: "Validation error.!!",
-        errors: error.details.map((err) => err.message.replace(/"/g, "")),
-      });
-    }
-
-    try {
-      const client = await Client.findByCredential(
-        req.body.email,
-        req.body.password
-      );
-
-      const token = await Client.generateAuthToken(client);
-
-      const authorization = {
-        access_token: token,
-        token_type: "bearer",
-        expires_in: "1h",
-      };
-
-      // client.token = token;
-      // if (client.save()) {
-      //   return responseHelper(res, "success", { authorization, data: client });
-      // }
-
-      // 2nd way to update user
-      const clientUpdate = await client.update({ token });
-      if (clientUpdate) {
-        return responseHelper(res, "success", { data: client, authorization });
-      }
-      return responseHelper(res, "exception", {
-        message: "Something went wrong!! Please contact tech support.!!",
-      });
-    } catch (error) {
-      return responseHelper(res, "exception", { error: error.message });
-    }
-  },
-
   activateAccount: async (req, res) => {
     const { token } = req.params;
     try {
@@ -144,7 +86,6 @@ const ClientController = {
         activated_date: new Date().toISOString().split("T")[0],
       };
       await client.update(dataToUpdate);
-
       const mailContent = {
         To: client.email,
         Subject: "Welcome to National Film Awards (NFA)",
@@ -154,7 +95,6 @@ const ClientController = {
         },
       };
       await Mail.accountActivationMail(mailContent);
-
       return responseHelper(res, "success", {
         message: "Account has been activated successfully.!!",
       });
@@ -164,21 +104,10 @@ const ClientController = {
   },
 
   verifyEmail: async (req, res) => {
-    if (!req.body || Object.keys(req.body).length === 0) {
-      return responseHelper(res, "validatorerrors", {
-        message: "Validation error.!!",
-        errors: ["Request body is required"],
-      });
+    const { isValid, errors } = ClientSchema.validateVerifyEmailInput(req.body);
+    if (!isValid) {
+      return responseHelper(res, "validatorerrors", { errors });
     }
-
-    const { error } = ClientSchema.validateEmail(req.body);
-    if (error) {
-      return responseHelper(res, "validatorerrors", {
-        message: "Validation error.!!",
-        errors: error.details.map((err) => err.message),
-      });
-    }
-
     try {
       const client = await Client.findOne({ where: { email: req.body.email } });
 
@@ -204,30 +133,59 @@ const ClientController = {
     }
   },
 
-  resetPassword: async (req, res) => {
-    if (!req.body || Object.keys(req.body).length === 0) {
-      return responseHelper(res, "validatorerrors", {
-        message: "Validation error.!!",
-        errors: ["Request body is required"],
-      });
+  login: async (req, res) => {
+    const { isValid, errors } = ClientSchema.loginValidate(req.body);
+
+    if (!isValid) {
+      return responseHelper(res, "validatorerrors", { errors });
     }
 
-    const { error } = ClientSchema.validateEmail(req.body);
-    if (error) {
-      return responseHelper(res, "validatorerrors", {
-        message: "Validation error.!!",
-        errors: error.details.map((err) => err.message),
+    try {
+      const client = await Client.findByCredential(
+        req.body.email,
+        req.body.password
+      );
+
+      const token = await Client.generateAuthToken(client);
+
+      const authorization = {
+        access_token: token,
+        token_type: "bearer",
+        expires_in: "1h",
+      };
+
+      // 1st to update user
+      client.token = token;
+      if (client.save()) {
+        return responseHelper(res, "success", { authorization, data: client });
+      }
+      // 2nd way to update user
+      // await client.update({ token });
+
+      return responseHelper(res, "exception", {
+        message: "Something went wrong!! Please contact tech support.!!",
       });
+    } catch (error) {
+      return responseHelper(res, "exception", { error: error.message });
+    }
+  },
+
+  resetPassword: async (req, res) => {
+    const { isValid, errors } = ClientSchema.resetPasswordValidate(req.body);
+    if (!isValid) {
+      return responseHelper(res, "validatorerrors", { errors });
     }
 
     try {
       const OTP = Twoauth.generateOtp();
+
       const client = await Client.findOne({ where: { email: req.body.email } });
       if (!client) {
         return responseHelper(res, "notvalid");
       }
 
       const twoauth = await Twoauth.findOne({ where: { email: client.email } });
+
       if (!twoauth) {
         twoauth = await Twoauth.create({
           client_id: client.id,
@@ -256,7 +214,6 @@ const ClientController = {
         },
       };
       await Mail.sendOtp(mailContent);
-
       return responseHelper(res, "success", {
         message: "An OTP has been sent to your registered email address.!!",
       });
@@ -266,19 +223,9 @@ const ClientController = {
   },
 
   verifyOtp: async (req, res) => {
-    if (!req.body || Object.keys(req.body).length === 0) {
-      return responseHelper(res, "validatorerrors", {
-        message: "Validation error.!!",
-        errors: ["Request body is required"],
-      });
-    }
-
-    const { error } = ClientSchema.verifyOtpValidate(req.body);
-    if (error) {
-      return responseHelper(res, "validatorerrors", {
-        message: "Validation error.!!",
-        errors: error.details.map((err) => err.message),
-      });
+    const { isValid, errors } = ClientSchema.verifyOtpValidate(req.body);
+    if (!isValid) {
+      return responseHelper(res, "validatorerrors", { errors });
     }
 
     try {
@@ -324,19 +271,9 @@ const ClientController = {
   },
 
   changePassword: async (req, res) => {
-    if (!req.body || Object.keys(req.body).length === 0) {
-      return responseHelper(res, "validatorerrors", {
-        message: "Validation error.!!",
-        errors: ["Request body is required"],
-      });
-    }
-
-    const { error } = ClientSchema.changePasswordValidate(req.body);
-    if (error) {
-      return responseHelper(res, "validatorerrors", {
-        message: "Validation error.!!",
-        errors: error.details.map((err) => err.message),
-      });
+    const { isValid, errors } = ClientSchema.changePasswordValidate(req.body);
+    if (!isValid) {
+      return responseHelper(res, "validatorerrors", { errors });
     }
 
     try {

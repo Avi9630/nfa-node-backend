@@ -128,8 +128,35 @@ const generateAuthToken = async (client) => {
   return token;
 };
 
+const checkDuplicateClient = async (data) => {
+  const errors = {};
+  const userEmail = await Client.findOne({ where: { email: data.email } });
+  if (userEmail) {
+    errors.email = "Email already been taken, Please provide a valid email.!!";
+  }
+
+  const userMobile = await Client.findOne({ where: { mobile: data.mobile } });
+  if (userMobile) {
+    errors.mobile =
+      "Mobile already been taken, Please provide a valid mobile.!!";
+  }
+
+  const userAadhaar = await Client.findOne({
+    where: { aadhar_number: data.aadhar_number },
+  });
+
+  if (userAadhaar) {
+    errors.aadhar_number = "Aadhaar already been taken.!!";
+  }
+
+  return {
+    isDuplicate: Object.keys(errors).length === 0,
+    errors,
+  };
+};
+
 Client.findByCredential = findByCredential;
 Client.generateUsername = generateUsername;
 Client.generateAuthToken = generateAuthToken;
-// module.exports = { Client, generateUsername };
+Client.checkDuplicateClient = checkDuplicateClient;
 module.exports = { Client };
