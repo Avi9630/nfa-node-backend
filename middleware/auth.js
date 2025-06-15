@@ -2,7 +2,7 @@ const jwt = require("jsonwebtoken");
 const { Client } = require("../models/Client");
 const responseHelper = require("../helpers/responseHelper");
 
-const auth = async (req, res, next) => {
+const Auth = async (req, res, next) => {
   try {
     const token = req.header("Authorization").replace("Bearer ", "");
     const decode = jwt.verify(token, process.env.JWT_SECRET);
@@ -18,4 +18,4 @@ const auth = async (req, res, next) => {
     responseHelper(res, "unauthorized", { error });
   }
 };
-module.exports = auth;
+module.exports = Auth;

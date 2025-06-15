@@ -8,6 +8,8 @@ const { Client } = require("../models/Client");
 const Mail = require("../mailer/Mail");
 const bcrypt = require("bcryptjs");
 const moment = require("moment");
+const { BestBookCinema } = require("../models/BestBookCinema");
+const { BestFilmCritic } = require("../models/BestFilmCritic");
 
 const ClientController = {
   register: async (req, res) => {
@@ -120,7 +122,7 @@ const ClientController = {
       // 2nd way to update user
       const clientUpdate = await client.update({ token });
       if (clientUpdate) {
-        return responseHelper(res, "success", { data: client, authorization });
+        return responseHelper(res, "success", { authorization, data: client });
       }
       return responseHelper(res, "exception", {
         message: "Something went wrong!! Please contact tech support.!!",
@@ -398,40 +400,31 @@ const ClientController = {
         nonFeature = await NfaNonFeature.findAll({
           where: { client_id: req.user.id },
         });
-
-        console.log(feature);
-        return "Controller";
-
-        // data.feature = feature;
-        // data.nonFeature = nonFeature;
-
-        responseHelper(res, "success", {
+        return responseHelper(res, "success", {
           message: "Here are your records.!!",
           data: {
             Feature: feature,
-            "Non Feature": nonFeature,
+            Non_Feature: nonFeature,
           },
         });
-      }
-
-      if (req.user.usertype === 2) {
-        // feature = await NfaFeature.findAll({
-        //   where: { client_id: req.user.id },
-        // });
-        // nonFeature = await NfaNonFeature.findAll({
-        //   where: { client_id: req.user.id },
-        // });
-
-        data.bestBook = {};
-        data.bestFilmCritic = {};
-
-        responseHelper(res, "success", {
-          message: "Here are your records.!!",
-          data: data,
+      } else if (req.user.usertype === 2) {
+        bestBooks = await BestBookCinema.findAll({
+          where: { client_id: req.user.id },
         });
-      }
 
-      throw Error("User not valid.!!");
+        bestFilmCritic = await BestFilmCritic.findAll({
+          where: { client_id: req.user.id },
+        });
+        return responseHelper(res, "success", {
+          message: "Here are your records.!!",
+          data: {
+            Best_Books: bestBooks,
+            Best_Film_Critic: bestFilmCritic,
+          },
+        });
+      } else {
+        throw Error("User not valid.!!");
+      }
     } catch (error) {
       responseHelper(res, "exception", { message: error.message });
     }

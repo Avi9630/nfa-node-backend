@@ -110,7 +110,7 @@ const findByCredential = async (clientEmail, clientPassword) => {
 
   if (!client.active) {
     throw new Error(
-      "Account not activated. Please check your email for activation link.!!"
+      "Account not activated. Please check your email for activation account.!!"
     );
   }
 
@@ -122,9 +122,13 @@ const findByCredential = async (clientEmail, clientPassword) => {
 };
 
 const generateAuthToken = async (client) => {
-  const token = jwt.sign({ id: client.id.toString() }, process.env.JWT_SECRET, {
-    expiresIn: "1h",
-  });
+  const token = jwt.sign(
+    { id: client.id.toString(), email: client.email.toString() },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "1h",
+    }
+  );
   return token;
 };
 
