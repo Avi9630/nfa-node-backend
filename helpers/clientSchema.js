@@ -75,7 +75,6 @@ const ClientSchema = {
         "any.required": "Captcha is required.",
       }),
     });
-
     return schema.validate(data, { abortEarly: false, allowUnknown: true });
   },
 

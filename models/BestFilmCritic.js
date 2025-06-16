@@ -22,57 +22,6 @@ const BestFilmCritic = sequelize.define(
       allowNull: false,
     },
 
-    writer_name: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-
-    article_title: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-
-    // article_title: {
-    //   type: DataTypes.TEXT,
-    //   allowNull: true,
-    // },
-
-    article_language_id: {
-      type: DataTypes.TEXT,
-      allowNull: true,
-      get() {
-        const rawValue = this.getDataValue("article_language_id");
-        try {
-          return rawValue ? JSON.parse(rawValue) : [];
-        } catch (e) {
-          return [];
-        }
-      },
-      // set(value) {
-      //   this.setDataValue("article_language_id", JSON.stringify(value));
-      // },
-    },
-
-    publication_date: {
-      type: DataTypes.DATE,
-      allowNull: true,
-    },
-
-    publication_name: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-
-    rni: {
-      type: DataTypes.TINYINT,
-      allowNull: true,
-    },
-
-    rni_registration_no: {
-      type: DataTypes.STRING,
-      allowNull: true,
-    },
-
     critic_name: {
       type: DataTypes.STRING,
       allowNull: true,
@@ -88,18 +37,13 @@ const BestFilmCritic = sequelize.define(
       allowNull: true,
     },
 
-    critic_indian_nationality: {
+    nationality: {
       type: DataTypes.TINYINT,
       allowNull: true,
     },
 
     critic_profile: {
       type: DataTypes.TEXT,
-      allowNull: true,
-    },
-
-    critic_aadhaar_card: {
-      type: DataTypes.STRING,
       allowNull: true,
     },
 
@@ -112,7 +56,13 @@ const BestFilmCritic = sequelize.define(
       type: DataTypes.TINYINT,
       allowNull: true,
     },
+
     declaration_three: {
+      type: DataTypes.TINYINT,
+      allowNull: true,
+    },
+
+    declaration_four: {
       type: DataTypes.TINYINT,
       allowNull: true,
     },
@@ -133,7 +83,7 @@ BestFilmCritic.hasMany(Document, {
 
 const consumeRecords = async (payload) => {
   const methodMap = {
-    [CONSTANT.stepsBestFilmCritic().BEST_FILM_CRITIC]: "consumeBESTFILMCRITIC",
+    [CONSTANT.stepsBestFilmCritic().CRITIC_DETAILS]: "consumeCRITICDETAILS",
     [CONSTANT.stepsBestFilmCritic().CRITIC]: "consumeCRITIC",
     [CONSTANT.stepsBestFilmCritic().PUBLISHER]: "consumePUBLISHER",
     [CONSTANT.stepsBestFilmCritic().DECLARATION]: "consumeDECLARATION",

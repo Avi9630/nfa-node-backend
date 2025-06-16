@@ -79,13 +79,21 @@ const Constant = {
 
   stepsBestFilmCritic: () => {
     return {
-      BEST_FILM_CRITIC: 1,
-      CRITIC: 2,
-      PUBLISHER: 3,
-      DECLARATION: 4,
-      FINAL_SUBMIT: 5,
+      CRITIC_DETAILS: 1,
+      ARTICLE: 2,
+      DECLARATION: 3,
+      FINAL_SUBMIT: 4,
     };
   },
+  // stepsBestFilmCritic: () => {
+  //   return {
+  //     BEST_FILM_CRITIC: 1,
+  //     CRITIC: 2,
+  //     PUBLISHER: 3,
+  //     DECLARATION: 4,
+  //     FINAL_SUBMIT: 5,
+  //   };
+  // },
 };
 
 module.exports = Constant;

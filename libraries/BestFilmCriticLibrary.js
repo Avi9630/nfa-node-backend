@@ -1,37 +1,15 @@
 const BestFilmCriticLibrary = {
-  consumeBESTFILMCRITIC: (payload) => {
-    const data = {};
-
-    data.client_id = payload.user.id;
-    data.last_id = payload.last_id ?? null;
-    data.writer_name = payload.writer_name;
-    data.article_title = payload.article_title;
-
-    if (typeof payload.article_language_id === "object") {
-      data.article_language_id = JSON.stringify(payload.article_language_id);
-    } else if (typeof payload.article_language_id === "string") {
-      let decoded;
-      try {
-        decoded = JSON.parse(payload.article_language_id);
-        if (!Array.isArray(decoded)) {
-          decoded = [decoded];
-        }
-      } catch (e) {
-        decoded = payload.article_language_id
-          .split(",")
-          .map((item) => item.trim());
-      }
-      data.article_language_id = JSON.stringify(decoded);
-    }
-
-    data.publication_date = payload.publication_date;
-    data.publication_name = payload.publication_name;
-    data.rni = payload.rni;
-    data.rni_registration_no =
-      payload.rni_registration_no && payload.rni_registration_no.trim() !== ""
-        ? payload.rni_registration_no
-        : null;
-    return data;
+  consumeCRITICDETAILS: (payload) => {
+    const consumeCritic = {
+      client_id: payload.user.id,
+      last_id: payload.last_id ?? null,
+      critic_name: payload.critic_name || null,
+      critic_address: payload.critic_address || null,
+      critic_contact: payload.critic_contact || null,
+      nationality: payload.nationality || null,
+      critic_profile: payload.critic_profile || null,
+    };
+    return consumeCritic;
   },
 
   consumeCRITIC: (payload) => {

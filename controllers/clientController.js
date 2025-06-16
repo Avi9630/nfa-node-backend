@@ -24,7 +24,8 @@ const ClientController = {
     if (error) {
       return responseHelper(res, "validatorerrors", {
         message: "Validation error.!!",
-        errors: error.details.map((err) => err.message),
+        // errors: error.details.map((err) => err.message),
+        errors: error.details.map((err) => err.message.replace(/"/g, "")),
       });
     }
 
@@ -134,9 +135,9 @@ const ClientController = {
 
   activateAccount: async (req, res) => {
     const { token } = req.params;
+
     try {
       const client = await Client.findOne({ where: { activate_token: token } });
-
       if (!client) {
         return responseHelper(res, "tokenexp", { message: "Invalid token" });
       }

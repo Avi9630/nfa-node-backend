@@ -11,13 +11,19 @@ const { Editor } = require("../models/Editor");
 const BestFilmCriticController = {
   Entry: async (req, res) => {
     const files = req.files;
-    const { isValid, errors } = BestFilmCriticHelper.validateStepInput(
-      req.body,
-      files
-    );
+    if (!req.body || Object.keys(req.body).length === 0) {
+      return responseHelper(res, "validatorerrors", {
+        message: "Validation error.!!",
+        errors: ["Request body is required"],
+      });
+    }
 
-    if (!isValid) {
-      return responseHelper(res, "validatorerrors", { errors });
+    const { error } = BestFilmCriticHelper.validateStepInput(req.body, files);
+    if (error) {
+      return responseHelper(res, "validatorerrors", {
+        message: "Validation error.!!",
+        errors: error.details.map((err) => err.message.replace(/"/g, "")),
+      });
     }
 
     try {
@@ -26,12 +32,8 @@ const BestFilmCriticController = {
         user: req.user,
         files: req.files,
       };
-
       const data = await BestFilmCritic.consumeRecords(payload);
       data.step = payload.step;
-
-      // console.log(req.body);
-      // return "From Controller";
 
       const user = await Client.findOne({ where: { id: payload.user.id } });
       if (user.usertype !== 2) {
@@ -41,7 +43,7 @@ const BestFilmCriticController = {
       }
 
       const stepHandlers = {
-        [CONSTANT.stepsBestFilmCritic().BEST_FILM_CRITIC]: async (
+        [CONSTANT.stepsBestFilmCritic().CRITIC_DETAILS]: async (
           data,
           payload
         ) =>
@@ -83,6 +85,7 @@ const BestFilmCriticController = {
             errors: result?.error || {},
           });
         }
+
         return responseHelper(res, "success", {
           message: result.message,
           data: result.data,
@@ -163,9 +166,28 @@ const BestFilmCriticController = {
 
       if (
         !checkForm.active_step ||
-        checkForm.active_step < CONSTANT.stepsBestFilmCritic().BEST_FILM_CRITIC
+        checkForm.active_step < CONSTANT.stepsBestFilmCritic().CRITIC_DETAILS
       ) {
-        data.active_step = CONSTANT.stepsBestFilmCritic().BEST_FILM_CRITIC;
+        data.active_step = CONSTANT.stepsBestFilmCritic().CRITIC_DETAILS;
+      }
+
+      if (payload.files && Array.isArray(payload.files)) {
+        const criticAadhaar = payload.files.find(
+          (file) => file.fieldname === "critic_aadhaar_card"
+        );
+        if (criticAadhaar) {
+          const fileUpload = await ImageLib.imageUpload({
+            id: lastId,
+            image_key: "critic_aadhaar_card",
+            websiteType: "NFA",
+            formType: "BEST_FILM_CRITIC",
+            image: criticAadhaar,
+          });
+
+          if (!fileUpload.status) {
+            return response("exception", { message: "Image not uploaded.!!" });
+          }
+        }
       }
 
       update = await checkForm.update(data);
@@ -174,15 +196,47 @@ const BestFilmCriticController = {
         message: "Records updated successfully.!!",
         data: update,
       };
+    } else {
+      data.active_step = payload.step;
+      create = await BestFilmCritic.create(data);
+
+      if (!create) {
+        return {
+          status: "exception",
+          data: {
+            message: "Something went wrong duting create.!!",
+          },
+        };
+      }
+
+      if (payload.files && Array.isArray(payload.files)) {
+        const criticAadhaar = payload.files.find(
+          (file) => file.fieldname === "critic_aadhaar_card"
+        );
+
+        if (criticAadhaar) {
+          const fileUpload = await ImageLib.imageUpload({
+            id: create.id,
+            image_key: "critic_aadhaar_card",
+            websiteType: "NFA",
+            formType: "BEST_FILM_CRITIC",
+            image: criticAadhaar,
+          });
+
+          if (!fileUpload.status) {
+            return {
+              status: "exception",
+              message: "Image not uploaded, Please update.!!",
+            };
+          }
+        }
+      }
+
+      return {
+        status: "created",
+        data: { message: "Best book created.!!", record: create },
+      };
     }
-
-    data.active_step = payload.step;
-    create = await BestFilmCritic.createFilmCritic(data);
-
-    return {
-      status: "created",
-      data: { message: "Beast book created.!!", record: create },
-    };
   },
 
   handleCriticStep: async (data, payload) => {
