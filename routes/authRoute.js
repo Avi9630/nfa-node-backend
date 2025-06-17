@@ -13,6 +13,7 @@ const BookController = require("../controllers/bookController");
 
 const express = require("express");
 const PaymentController = require("../controllers/PaymentController");
+const ArticleController = require("../controllers/articleController");
 const router = express.Router();
 
 //**************************CLIENTS*******************************//
@@ -37,7 +38,6 @@ router.post(
   "/best-book-cinema-final-submit",
   BestBookCinemaController.finalSubmit
 );
-
 router.get(
   "/best-book-cinema-entry-by/:id",
   BestBookCinemaController.bestBookById
@@ -49,11 +49,17 @@ router.post(
   "/best-film-critic-final-submit",
   BestFilmCriticController.finalSubmit
 );
-
 router.get(
   "/best-film-critic-entry-by/:id",
   BestFilmCriticController.bestFilmCriticById
 );
+
+//*************************ARTICLE*********************************//
+router.post("/store-article", ArticleController.storeArticle);
+// router.post("/update-article", ArticleController.updateArticle);
+// router.get("/list-article/:best_film_critic_id", ArticleController.listArticle);
+// router.get("/get-article-by/:id", ArticleController.getArticle);
+// router.get("/delete-article/:id", ArticleController.deleteArticle);
 
 //**************************PRODUCER*******************************//
 router.post("/store-producer", ProducerController.storeProducer);

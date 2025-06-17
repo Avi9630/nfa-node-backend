@@ -84,8 +84,7 @@ BestFilmCritic.hasMany(Document, {
 const consumeRecords = async (payload) => {
   const methodMap = {
     [CONSTANT.stepsBestFilmCritic().CRITIC_DETAILS]: "consumeCRITICDETAILS",
-    [CONSTANT.stepsBestFilmCritic().CRITIC]: "consumeCRITIC",
-    [CONSTANT.stepsBestFilmCritic().PUBLISHER]: "consumePUBLISHER",
+    [CONSTANT.stepsBestFilmCritic().ARTICLE]: "consumeARTICLE",
     [CONSTANT.stepsBestFilmCritic().DECLARATION]: "consumeDECLARATION",
   };
   if (methodMap[payload.step]) {

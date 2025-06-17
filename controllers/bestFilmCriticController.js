@@ -11,12 +11,12 @@ const { Editor } = require("../models/Editor");
 const BestFilmCriticController = {
   Entry: async (req, res) => {
     const files = req.files;
-    if (!req.body || Object.keys(req.body).length === 0) {
-      return responseHelper(res, "validatorerrors", {
-        message: "Validation error.!!",
-        errors: ["Request body is required"],
-      });
-    }
+    // if (!req.body || Object.keys(req.body).length === 0) {
+    //   return responseHelper(res, "validatorerrors", {
+    //     message: "Validation error.!!",
+    //     errors: ["Request body is required"],
+    //   });
+    // }
 
     const { error } = BestFilmCriticHelper.validateStepInput(req.body, files);
     if (error) {
