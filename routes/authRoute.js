@@ -56,10 +56,10 @@ router.get(
 
 //*************************ARTICLE*********************************//
 router.post("/store-article", ArticleController.storeArticle);
-// router.post("/update-article", ArticleController.updateArticle);
-// router.get("/list-article/:best_film_critic_id", ArticleController.listArticle);
-// router.get("/get-article-by/:id", ArticleController.getArticle);
-// router.get("/delete-article/:id", ArticleController.deleteArticle);
+router.post("/update-article", ArticleController.updateArticle);
+router.get("/list-article/:best_film_critic_id", ArticleController.listArticle);
+router.get("/get-article-by/:id", ArticleController.getArticle);
+router.get("/delete-article/:id", ArticleController.deleteArticle);
 
 //**************************PRODUCER*******************************//
 router.post("/store-producer", ProducerController.storeProducer);

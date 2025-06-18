@@ -1,5 +1,7 @@
 const responseHelper = require("../helpers/responseHelper");
 const ArticleHelper = require("../helpers/articleHelper");
+const { BestFilmCritic } = require("../models/BestFilmCritic");
+const { Article } = require("../models/Article");
 
 const ArticleController = {
   storeArticle: async (req, res) => {
@@ -14,49 +16,62 @@ const ArticleController = {
     try {
       const payload = {
         ...req.body,
-        // user: req.user,
+        user: req.user,
       };
 
-      console.log(payload);
-      console.log("From controller");
-      return;
-
-      nfaFeature = await NfaFeature.findOne({
-        where: { id: payload.nfa_feature_id, client_id: payload.user.id },
+      bestFilmCritic = await BestFilmCritic.findOne({
+        where: { id: payload.best_film_critic_id, client_id: payload.user.id },
       });
-      if (!nfaFeature) {
+      if (!bestFilmCritic) {
         return responseHelper(res, "noresult");
       }
 
       arrayToInsert = {
-        nfa_feature_id: payload.nfa_feature_id ?? null,
-        actor_category_id: payload.actor_category_id,
-        name: payload.name,
-        screen_name: payload.screen_name,
-        if_voice_dubbed: payload.if_voice_dubbed,
+        client_id: payload.user.id ?? null,
+        best_film_critic_id: payload.best_film_critic_id,
+        article_type: payload.article_type,
+        writer_name: payload.writer_name,
+        article_title: payload.article_title,
+        language_id: payload.language_id,
+        other_language: payload.other_language ?? null,
+        date_of_publication: payload.date_of_publication ?? null,
+        name_of_publication: payload.name_of_publication ?? null,
+        rni: payload.rni ?? null,
+        publisher_furnished: payload.publisher_furnished ?? null,
+        original_writing: payload.original_writing ?? null,
+        website_link: payload.website_link ?? null,
+        publisher_name: payload.publisher_name ?? null,
+        publisher_email: payload.publisher_email ?? null,
+        publisher_mobile: payload.publisher_mobile ?? null,
+        publisher_landline: payload.publisher_landline ?? null,
+        publisher_address: payload.publisher_address ?? null,
+        publisher_citizenship: payload.publisher_citizenship ?? null,
       };
 
-      actor = await Actor.create(arrayToInsert);
+      article = await Article.create(arrayToInsert);
 
-      if (!actor) {
+      if (!article) {
         return responseHelper(res, "noresult", {
-          message: "Actor not created.!!",
+          message: "Article not created.!!",
         });
       }
+
       return responseHelper(res, "created", {
-        message: "Producer created successfully.!!",
-        data: actor,
+        message: "Article addedd successfully.!!",
+        data: article,
       });
     } catch (error) {
       return responseHelper(res, "exception", { message: error.message });
     }
   },
 
-  updateActor: async (req, res) => {
-    const { isValid, errors } = ActorSchema.validateUpdate(req.body);
-
-    if (!isValid) {
-      return responseHelper(res, "validatorerrors", { errors });
+  updateArticle: async (req, res) => {
+    const { error } = ArticleHelper.updateValidate(req.body);
+    if (error) {
+      return responseHelper(res, "validatorerrors", {
+        message: "Validation error.!!",
+        errors: error.details.map((err) => err.message.replace(/"/g, "")),
+      });
     }
 
     try {
@@ -65,33 +80,67 @@ const ArticleController = {
         user: req.user,
       };
 
-      actor = await Actor.findOne({ where: { id: payload.id } });
+      article = await Article.findOne({
+        where: {
+          id: payload.id,
+          best_film_critic_id: payload.best_film_critic_id,
+        },
+      });
 
-      if (actor) {
-        if (payload.nfa_feature_id !== undefined) {
-          nfaFeature = await NfaFeature.findOne({
-            where: { id: payload.nfa_feature_id, client_id: payload.user.id },
+      if (article) {
+        if (
+          payload.best_film_critic_id !== String(article.best_film_critic_id)
+        ) {
+          return responseHelper(res, "noresult", {
+            message: "Can not modify best_film_critic_id.!!",
           });
+        }
 
-          if (!nfaFeature) {
-            return responseHelper(res, "noresult");
-          }
+        bestFilmCritic = await BestFilmCritic.findOne({
+          where: {
+            id: payload.best_film_critic_id,
+            client_id: payload.user.id,
+          },
+        });
+
+        if (!bestFilmCritic) {
+          return responseHelper(res, "noresult");
         }
 
         arrayToUpdate = {
-          nfa_feature_id: payload.nfa_feature_id ?? actor.nfa_feature_id,
-          actor_category_id:
-            payload.actor_category_id ?? actor.actor_category_id,
-          name: payload.name ?? actor.name,
-          screen_name: payload.screen_name ?? actor.screen_name,
-          if_voice_dubbed: payload.if_voice_dubbed ?? actor.if_voice_dubbed,
+          article_type: payload.article_type ?? article.article_type,
+          writer_name: payload.writer_name ?? article.writer_name,
+          article_title: payload.article_title ?? article.article_title,
+          language_id: payload.language_id ?? article.language_id,
+          other_language: payload.other_language ?? article.other_language,
+          date_of_publication:
+            payload.date_of_publication ?? article.date_of_publication,
+          name_of_publication:
+            payload.name_of_publication ?? article.name_of_publication,
+          rni: payload.rni ?? article.rni,
+          publisher_furnished:
+            payload.publisher_furnished ?? article.publisher_furnished,
+          original_writing:
+            payload.original_writing ?? article.original_writing,
+          website_link: payload.website_link ?? article.website_link,
+          publisher_name: payload.publisher_name ?? article.publisher_name,
+          publisher_email: payload.publisher_email ?? article.publisher_email,
+          publisher_mobile:
+            payload.publisher_mobile ?? article.publisher_mobile,
+          publisher_landline:
+            payload.publisher_landline ?? article.publisher_landline,
+          publisher_address:
+            payload.publisher_address ?? article.publisher_address,
+          publisher_citizenship:
+            payload.publisher_citizenship ?? article.publisher_citizenship,
         };
 
-        actorUpdate = await actor.update(arrayToUpdate);
-        if (actorUpdate) {
+        articleUpdate = await article.update(arrayToUpdate);
+
+        if (articleUpdate) {
           return responseHelper(res, "success", {
-            message: "Actor updated successfully.!!",
-            data: actorUpdate,
+            message: "Article updated successfully.!!",
+            data: articleUpdate,
           });
         } else {
           responseHelper(res, "updateError");
@@ -104,25 +153,36 @@ const ArticleController = {
     }
   },
 
-  listActor: async (req, res) => {
+  listArticle: async (req, res) => {
     try {
       const payload = {
         ...req.params,
         user: req.user,
       };
-      nfaFeature = NfaFeature.findOne({
-        where: { id: payload.feature_id, client_id: payload.user.id },
+
+      bestFilmCritic = BestFilmCritic.findOne({
+        where: { id: payload.best_film_critic_id, client_id: payload.user.id },
       });
-      if (!nfaFeature) {
+
+      if (!bestFilmCritic) {
         responseHelper(res, "noresult");
       }
-      actorList = await Actor.findAll({
-        where: { nfa_feature_id: payload.feature_id },
+
+      articleList = await Article.findAll({
+        where: { best_film_critic_id: payload.best_film_critic_id },
       });
-      if (actorList.length > 0) {
+
+      if (articleList.length > 0) {
+        if (articleList.length < 5) {
+          return responseHelper(res, "noresult", {
+            goNext: false,
+            message: "At least 5 article must be submitted.!!",
+            data: articleList,
+          });
+        }
         responseHelper(res, "success", {
           message: "Here are your records.!!",
-          data: actorList,
+          data: articleList,
         });
       } else {
         responseHelper(res, "noresult");
@@ -132,19 +192,19 @@ const ArticleController = {
     }
   },
 
-  getActor: async (req, res) => {
+  getArticle: async (req, res) => {
     try {
       const payload = {
         ...req.params,
         user: req.user,
       };
-      actorList = await Actor.findOne({
+      articleList = await Article.findOne({
         where: { id: payload.id },
       });
-      if (actorList) {
+      if (articleList) {
         responseHelper(res, "success", {
           message: "Here are your records.!!",
-          data: actorList,
+          data: articleList,
         });
       } else {
         responseHelper(res, "noresult");
@@ -154,39 +214,22 @@ const ArticleController = {
     }
   },
 
-  deleteActor: async (req, res) => {
+  deleteArticle: async (req, res) => {
     try {
       const payload = {
         ...req.params,
         user: req.user,
       };
-      actor = await Actor.findOne({
+      article = await Article.findOne({
         where: { id: payload.id },
       });
-      if (actor) {
-        actor.destroy();
+      if (article) {
+        article.destroy();
         responseHelper(res, "success", {
           message: "Records deleted successfully.!!",
         });
       } else {
         responseHelper(res, "noresult");
-      }
-    } catch (errors) {
-      responseHelper(res, "exception", { message: errors.message });
-    }
-  },
-
-  allActorCategory: async (req, res) => {
-    try {
-      const actorCategory = await Knex("actor_category").select("id", "name");
-
-      if (actorCategory.length > 0) {
-        responseHelper(res, "success", {
-          message: "Actor category fetched successfully!",
-          data: actorCategory,
-        });
-      } else {
-        responseHelper(res, "notvalid");
       }
     } catch (errors) {
       responseHelper(res, "exception", { message: errors.message });
